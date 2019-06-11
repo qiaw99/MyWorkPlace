@@ -739,11 +739,11 @@ class GoAndBack implements Shape,Animation{
 	    if ( (center.y+radius)<welt.getMax_Y() && (i==0) )
 	 	   center.y = center.y + velocity;
 	    if((center.y+radius)==welt.getMax_Y())
-	    	i+=1;
+	    	i=1;
 	    if((center.y-radius>welt.getMin_Y()&& (i==1)))
-	    	center.y=welt.getMax_Y()-velocity-center.y;
+	    	center.y=center.y-velocity;
 	    if((center.y+radius)==welt.getMin_Y())
-	    	i-=1;
+	    	i=0;
    }
 
 	public boolean contains(double x, double y) {
