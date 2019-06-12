@@ -683,13 +683,14 @@ class GoAndBack implements Shape,Animation{
 	double radius;
 	Point center;
     Random rand;
-   
+	int i;
     Color color;
     ShapesWorld welt;
     double velocity = 2;
 
    public GoAndBack() {	
 	   this.radius = 25;
+	   this.i = 0;
 	   this.color = Color.CYAN; 
 	   this.center = new Point();
 	   this.rand = new Random();
@@ -735,16 +736,42 @@ class GoAndBack implements Shape,Animation{
 
    // implement the Animation-Interface
    public void play(){
-	   	int i=0;
-	    if ( (center.y+radius)<welt.getMax_Y() && (i==0) )
+	    if ( (center.y + radius) < welt.getMax_Y() && (i==0) )
 	 	   center.y = center.y + velocity;
-	    if((center.y+radius)==welt.getMax_Y())
-	    	i=1;
-	    if((center.y-radius>welt.getMin_Y()&& (i==1)))
-	    	center.y=center.y-velocity;
-	    if((center.y+radius)==welt.getMin_Y())
-	    	i=0;
+	    else if((center.y + radius) >= welt.getMax_Y()) {
+	    	i = 1;
+			center.y = center.y - velocity;
+		}
+	    if( (center.y - radius > welt.getMin_Y()&& (i==1)))
+	    	center.y = center.y - velocity;
+	    else if ((center.y - radius) <= welt.getMin_Y()) {
+	    	i = 0;
+			center.y = center.y + velocity;
+		}
    }
+   /*
+   public void play() {
+	   int top = 0;
+	   if ( (center.y + radius) < welt.getMax_Y() && !i) {
+		   center.y += velocity;
+	   }
+	   else if ( (center.y + radius) >= welt.getMax_Y()) {
+		   top = 1;
+		   center.y -= velocity;
+	   }
+	   else if ( (center.y + radius) >=
+   }*/
+   
+   
+   /*
+   public void play()
+	   {
+		    if ( (center.x-radius)<=welt.getMax_X() )
+		    	center.x = center.x + velocity;
+		    else
+		    	center.x = welt.getMin_X()+radius;
+	   }*/
+   
 
 	public boolean contains(double x, double y) {
 		if (y<(center.y-radius) || y>center.y+radius || x<(center.x-radius) || x>(center.x+radius))
