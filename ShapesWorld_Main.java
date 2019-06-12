@@ -692,6 +692,129 @@ interface ShapesWorld {
 } // end of the ShapesWorld interface
 
 
+class Stein implements Shape, Animation {
+	double radius;
+	Point center;
+	Random rand;
+	boolean change;
+	Color color;
+	ShapesWorld welt;
+	double diffY;
+	double k;
+	int w;
+	int h;
+	double yd;
+	double newX, newY;
+	Shape MiniStein;
+	public Stein() {
+		this.h = 50;
+		this.w = 100;
+		this.k = 1.025;
+		this.diffY = 1;
+		this.change = true;
+		this.color = Color.CYAN;
+		this.center = new Point();
+		this.rand = new Random();
+	}
+
+	public void play() {
+		if ((center.y - h/2) < welt.getMax_Y()) {
+			center.y = center.y + diffY * k;
+			diffY += 0.05;
+		}
+		else {
+			welt.removeShape(this);
+			for(int i = 0; i < 8; i++) {
+				this.welt.addShape (new MiniStein());
+			}
+		}
+	}
+
+	public boolean inShape(double x, double y) {
+		if ( ((y + radius) >= welt.getMax_Y()) || ((y - radius) <= welt.getMin_Y()) ||
+		     ((x + radius) >= welt.getMax_X()) || ((x - radius) <= welt.getMin_X())) {
+			return false;
+		}
+		else {
+			return true;			
+		}
+	}
+	
+	public Color getColor() {
+        	return color;
+	}
+
+	public void moveTo(double x, double y) {
+		center.x = (int) x;
+		center.y = (int) y;
+	}
+
+	public void setShapesWorld(ShapesWorld theWorld) {
+		this.welt = theWorld;
+	}
+
+	public void draw(Graphics g) {
+		g.setColor(color);
+    		g.drawRect((int)center.x - w/2, (int)center.y - h, w, h);
+    		g.fillRect((int)center.x - w/2, (int)center.y - h, w, h);
+	}
+
+
+	public Point getCenter() {
+		return center;
+	}
+
+	public void userClicked(double atX, double atY) {
+		this.radius += 2;
+		this.welt.addShape(new GoAndBack());
+	}
+
+	public void userTyped(char key) {
+		System.out.println("key");
+	}
+
+	public boolean contains(double x, double y) {
+		if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
+		    return false;
+		else
+		    return true;
+	}
+
+	public double getRadius() {
+		return radius;
+	}
+}
+
+class MiniStein extends Stein {
+	int h, w;	
+	int randX;
+	public MiniStein() {
+		this.h = 10;
+		this.w = 10;
+		this.randX = 300000;
+	}	
+
+	public void play() {
+
+	}
+
+	public int generateX (int newX) {
+		if (newX == 300000) {
+			newX= rand.nextInt((welt.getMax_X() - w/2)* 2)  - welt.getMax_X() + w/2;
+		}
+		return newX;
+
+	}
+
+	public void draw(Graphics g) {
+		randX = generateX(randX);
+		g.setColor(color);
+    		g.drawRect(randX, welt.getMax_Y() - h, w, h);
+    		g.fillRect(randX, welt.getMax_Y() - h, w, h);
+	}
+}
+
+
 class Captive implements Shape, Animation {
 	double radius;
 	Point center;
@@ -805,6 +928,8 @@ class Captive implements Shape, Animation {
 		return radius;
 	}
 }
+
+
 
 class GoAndBack implements Shape, Animation {
     double radius;
