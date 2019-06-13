@@ -187,7 +187,7 @@ class ShapeFrame extends JFrame {
             System.out.println("removeShape");
         }
 
-        // implementation of the Runnable-Interface		
+        // implementation of the Runnable-Interface
         public void run() {
             while (anim == Thread.currentThread()) {
                 try {
@@ -265,7 +265,7 @@ class CrazyWalker implements Shape, Animation {
         this.center = new Point(0, 0);
         this.color = Color.magenta;
     }
-	
+
     @Override
     public void play() {
         int d = rand.nextInt(4);
@@ -505,15 +505,15 @@ class Point {
     }
 
 } // end of Point class
-/** the Shape "interface" includes the methods that the Shape objects need in order to work with the 
- *  other classes. 
+/** the Shape "interface" includes the methods that the Shape objects need in order to work with the
+ *  other classes.
  *  A class that implements this interface must define at least all methods given here.
  */
 
 interface Shape {
 
-    /** 
-     * the draw method gets a graphical context g so that the shape-objects can 
+    /**
+     * the draw method gets a graphical context g so that the shape-objects can
      * paint themselves using the methods of g.
      */
     public void draw(Graphics g);
@@ -522,7 +522,7 @@ interface Shape {
     public boolean contains(double x, double y);
 
     /**
-     * returns the radius of the circle that surrounds the shape object 
+     * returns the radius of the circle that surrounds the shape object
      */
     public double getRadius();
 
@@ -532,28 +532,28 @@ interface Shape {
     public Color getColor();
 
     /**
-     * returns the center of the Shape-object using floating-point numbers for 
+     * returns the center of the Shape-object using floating-point numbers for
      * the x- and y-coordinates (double).
      */
     public Point getCenter();
 
     /**
      * this method is always called after a Shape-object has been created.
-     * If you want to have access to the ShapeWorld-object to get information about the 
+     * If you want to have access to the ShapeWorld-object to get information about the
      * other Shape-objects, you need to store this reference as an instance variable of
      * your Shape-class.
      */
     public void setShapesWorld(ShapesWorld theWorld);
 
     /**
-     * this method is called when the user clicks the mouse on a Shape-object. 
-     * The at_X and at_Y parameters correspond to the (x, y)-coordinates of the mouse 
+     * this method is called when the user clicks the mouse on a Shape-object.
+     * The at_X and at_Y parameters correspond to the (x, y)-coordinates of the mouse
      * click.
      */
     public void userClicked(double at_X, double at_Y);
 
     /**
-     * this method is called when the user presses the mouse selecting a Shape-object and 
+     * this method is called when the user presses the mouse selecting a Shape-object and
      * then presses a key. In key we get the pressed key.
      */
     public void userTyped(char key);
@@ -693,243 +693,364 @@ interface ShapesWorld {
 
 
 class Stein implements Shape, Animation {
-	double radius;
-	Point center;
-	Random rand;
-	boolean change;
-	Color color;
-	ShapesWorld welt;
-	double diffY;
-	double k;
-	int w;
-	int h;
-	double yd;
-	double newX, newY;
-	Shape MiniStein;
-	public Stein() {
-		this.h = 50;
-		this.w = 100;
-		this.k = 1.025;
-		this.diffY = 1;
-		this.change = true;
-		this.color = Color.CYAN;
-		this.center = new Point();
-		this.rand = new Random();
-	}
+        double radius;
+        Point center;
+        Random rand;
+        boolean change;
+        Color color;
+        ShapesWorld welt;
+        double diffY;
+        double k;
+        int w;
+        int h;
+        double yd;
+        double newX, newY;
+        Shape MiniStein;
+        public Stein() {
+                this.h = 50;
+                this.w = 100;
+                this.k = 1.025;
+                this.diffY = 1;
+                this.change = true;
+                this.color = Color.CYAN;
+                this.center = new Point();
+                this.rand = new Random();
+        }
 
-	public void play() {
-		if ((center.y - h/2) < welt.getMax_Y()) {
-			center.y = center.y + diffY * k;
-			diffY += 0.05;
-		}
-		else {
-			welt.removeShape(this);
-			for(int i = 0; i < 8; i++) {
-				this.welt.addShape (new MiniStein());
-			}
-		}
-	}
+        public void play() {
+                if ((center.y - h/2) < welt.getMax_Y()) {
+                        center.y = center.y + diffY * k;
+                        diffY += 0.05;
+                }
+                else {
+                        welt.removeShape(this);
+                        for(int i = 0; i < 8; i++) {
+                                this.welt.addShape (new MiniStein());
+                        }
+                }
+        }
 
-	public boolean inShape(double x, double y) {
-		if ( ((y + radius) >= welt.getMax_Y()) || ((y - radius) <= welt.getMin_Y()) ||
-		     ((x + radius) >= welt.getMax_X()) || ((x - radius) <= welt.getMin_X())) {
-			return false;
-		}
-		else {
-			return true;			
-		}
-	}
-	
-	public Color getColor() {
-        	return color;
-	}
+        public boolean inShape(double x, double y) {
+                if ( ((y + radius) >= welt.getMax_Y()) || ((y - radius) <= welt.getMin_Y()) ||
+                     ((x + radius) >= welt.getMax_X()) || ((x - radius) <= welt.getMin_X())) {
+                        return false;
+                }
+                else {
+                        return true;
+                }
+        }
 
-	public void moveTo(double x, double y) {
-		center.x = (int) x;
-		center.y = (int) y;
-	}
+        public Color getColor() {
+                return color;
+        }
 
-	public void setShapesWorld(ShapesWorld theWorld) {
-		this.welt = theWorld;
-	}
+        public void moveTo(double x, double y) {
+                center.x = (int) x;
+                center.y = (int) y;
+        }
 
-	public void draw(Graphics g) {
-		g.setColor(color);
-    		g.drawRect((int)center.x - w/2, (int)center.y - h, w, h);
-    		g.fillRect((int)center.x - w/2, (int)center.y - h, w, h);
-	}
+        public void setShapesWorld(ShapesWorld theWorld) {
+                this.welt = theWorld;
+        }
+
+        public void draw(Graphics g) {
+                g.setColor(color);
+                g.drawRect((int)center.x - w/2, (int)center.y - h, w, h);
+                g.fillRect((int)center.x - w/2, (int)center.y - h, w, h);
+        }
 
 
-	public Point getCenter() {
-		return center;
-	}
+        public Point getCenter() {
+                return center;
+        }
 
-	public void userClicked(double atX, double atY) {
-		this.radius += 2;
-		this.welt.addShape(new GoAndBack());
-	}
+        public void userClicked(double atX, double atY) {
+                this.radius += 2;
+                this.welt.addShape(new GoAndBack());
+        }
 
-	public void userTyped(char key) {
-		System.out.println("key");
-	}
+        public void userTyped(char key) {
+                System.out.println("key");
+        }
 
-	public boolean contains(double x, double y) {
-		if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
-		    return false;
-		else
-		    return true;
-	}
+        public boolean contains(double x, double y) {
+                if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
+                    return false;
+                else
+                    return true;
+        }
 
-	public double getRadius() {
-		return radius;
-	}
+        public double getRadius() {
+                return radius;
+        }
 }
 
 class MiniStein extends Stein {
-	int h, w;	
-	int randX;
-	public MiniStein() {
-		this.h = 10;
-		this.w = 10;
-		this.randX = 300000;
-	}	
+        int h, w;
+        int randX;
+        public MiniStein() {
+                this.h = 10;
+                this.w = 10;
+                this.randX = 300000;
+        }
 
-	public void play() {
+        public void play() {
 
-	}
+        }
 
-	public int generateX (int newX) {
-		if (newX == 300000) {
-			newX= rand.nextInt((welt.getMax_X() - w/2)* 2)  - welt.getMax_X() + w/2;
-		}
-		return newX;
+        public int generateX (int newX) {
+                if (newX == 300000) {
+                        newX= rand.nextInt((welt.getMax_X() - w/2)* 2)  - welt.getMax_X() + w/2;
+                }
+                return newX;
 
-	}
+        }
 
-	public void draw(Graphics g) {
-		randX = generateX(randX);
-		g.setColor(color);
-    		g.drawRect(randX, welt.getMax_Y() - h, w, h);
-    		g.fillRect(randX, welt.getMax_Y() - h, w, h);
-	}
+        public void draw(Graphics g) {
+                randX = generateX(randX);
+                g.setColor(color);
+                g.drawRect(randX, welt.getMax_Y() - h, w, h);
+                g.fillRect(randX, welt.getMax_Y() - h, w, h);
+        }
 }
 
 
 class Captive implements Shape, Animation {
-	double radius;
-	Point center;
-	Random rand;
-	boolean change;
-	Color color;
-	ShapesWorld welt;
-	double velocity = 2;
-	double xd;
-	double yd;
-	double newX, newY;
-	public Captive() {
-		this.radius = 25;
-		this.change = true;
-		this.color = Color.CYAN;
-		this.center = new Point();
-		this.rand = new Random();
-	}
+        double radius;
+        Point center;
+        Random rand;
+        boolean change;
+        Color color;
+        ShapesWorld welt;
+        double velocity = 2;
+        double xd;
+        double yd;
+        double newX, newY;
+        public Captive() {
+                this.radius = 25;
+                this.change = true;
+                this.color = Color.CYAN;
+                this.center = new Point();
+                this.rand = new Random();
+        }
 
-	public void play() {
-		if (!change) {	
-			newX = center.x + xd * velocity;
-			newY = center.y + yd * velocity;
-			if(inShape(newX, newY)) {
-				center.x = newX;
-				center.y = newY;
-			}
-			else
-				change = true;
-		}
-		else {
-			xd = rand.nextInt(3) - 1;
-	 		yd = rand.nextInt(3) - 1;
-			if (xd == 0 && yd == 0)
-				xd = 1;
-			newX = center.x + xd * velocity;
-			newY = center.y + yd * velocity;
-			if (!inShape(newX, newY)) {	
-				play();
-			}
-			change = false;
-		}
-	}
+        public void play() {
+                if (!change) {
+                        newX = center.x + xd * velocity;
+                        newY = center.y + yd * velocity;
+                        if(inShape(newX, newY)) {
+                                center.x = newX;
+                                center.y = newY;
+                        }
+                        else
+                                change = true;
+                }
+                else {
+                        xd = rand.nextInt(3) - 1;
+                        yd = rand.nextInt(3) - 1;
+                        if (xd == 0 && yd == 0)
+                                xd = 1;
+                        newX = center.x + xd * velocity;
+                        newY = center.y + yd * velocity;
+                        if (!inShape(newX, newY)) {
+                                play();
+                        }
+                        change = false;
+                }
+        }
 
-	public boolean inShape(double x, double y) {
-		if ( ((y + radius) >= welt.getMax_Y()) || ((y - radius) <= welt.getMin_Y()) ||
-		     ((x + radius) >= welt.getMax_X()) || ((x - radius) <= welt.getMin_X())) {
-			return false;
-		}
-		else {
-			return true;			
-		}
-	}
-	
-	public Color getColor() {
-        	return color;
-	}
+        public boolean inShape(double x, double y) {
+                if ( ((y + radius) >= welt.getMax_Y()) || ((y - radius) <= welt.getMin_Y()) ||
+                     ((x + radius) >= welt.getMax_X()) || ((x - radius) <= welt.getMin_X())) {
+                        return false;
+                }
+                else {
+                        return true;
+                }
+        }
 
-	public void moveTo(double x, double y) {
-		center.x = (int) x;
-		center.y = (int) y;
-	}
+        public Color getColor() {
+                return color;
+        }
 
-	public void setShapesWorld(ShapesWorld theWorld) {
-		this.welt = theWorld;
-	}
+        public void moveTo(double x, double y) {
+                center.x = (int) x;
+                center.y = (int) y;
+        }
 
-	public void draw(Graphics g) {
-		g.setColor(color);
-		fillTriangle(g, center.x - radius, center.y - radius, radius * 2, radius * 2);
-	}
+        public void setShapesWorld(ShapesWorld theWorld) {
+                this.welt = theWorld;
+        }
 
-	public void fillTriangle(Graphics g, double x, double y, double w, double h) {
-		int[] x_coords = {
-		    (int)(x + w / 2),
-		    (int)(x),
-		    (int)(x + w)
-		};
-		int[] y_coords = {
-		    (int)(y),
-		    (int)(y + h),
-		    (int)(y + h)
-		};
-		Polygon p = new Polygon(x_coords, y_coords, 3);
-		g.fillPolygon(p);
-	}
+        public void draw(Graphics g) {
+                g.setColor(color);
+                fillTriangle(g, center.x - radius, center.y - radius, radius * 2, radius * 2);
+        }
 
-	public Point getCenter() {
-		return center;
-	}
+        public void fillTriangle(Graphics g, double x, double y, double w, double h) {
+                int[] x_coords = {
+                    (int)(x + w / 2),
+                    (int)(x),
+                    (int)(x + w)
+                };
+                int[] y_coords = {
+                    (int)(y),
+                    (int)(y + h),
+                    (int)(y + h)
+                };
+                Polygon p = new Polygon(x_coords, y_coords, 3);
+                g.fillPolygon(p);
+        }
 
-	public void userClicked(double atX, double atY) {
-		this.radius += 2;
-		this.welt.addShape(new GoAndBack());
-	}
+        public Point getCenter() {
+                return center;
+        }
 
-	public void userTyped(char key) {
-		System.out.println("key");
-	}
+        public void userClicked(double atX, double atY) {
+                this.radius += 2;
+                this.welt.addShape(new GoAndBack());
+        }
+
+        public void userTyped(char key) {
+                System.out.println("key");
+        }
 
 
 
-	public boolean contains(double x, double y) {
-		if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
-		    return false;
-		else
-		    return true;
-	}
+        public boolean contains(double x, double y) {
+                if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
+                    return false;
+                else
+                    return true;
+        }
 
-	public double getRadius() {
-		return radius;
-	}
+        public double getRadius() {
+                return radius;
+        }
 }
 
+class Roboter implements Shape, Animation {
+    double radius;
+    Point center;
+    Random rand;
+    int ifJump;
+    int ifJumpBack;
+    int i;
+    Color color;
+    ShapesWorld welt;
+    double velocity = 2;
 
+    public Roboter() {
+        this.radius = 25;
+        this.i = 0;
+        this.ifJump = -10000;
+        this.ifJumpBack = -10000;
+        this.color = Color.CYAN;
+        this.center = new Point();
+        this.rand = new Random();
+    }
+
+
+
+    public void userTyped(char key) {
+        if(ifJump == -10000) {
+            if (key == 'd') {
+                center.x += 20;
+            }
+            else if (key == 'a') {
+                center.x -= 20;
+            }
+            else if (key == 'w') {
+                    center.y -= 20;
+            }
+            else if (key == 's') {
+                    center.y += 20;
+            }
+            else if (key == 'j') {
+                    ifJump = 100;
+                    ifJumpBack = 100;
+            }
+            else
+                System.out.println(key + " is false input for Object Roboter. Try w, a, s, d and j");
+        }
+    }
+
+
+    // implement the Animation-Interface
+    public void play() {
+        if (ifJump > 0) {
+            if(center.y - 1 >= welt.getMin_Y()){
+                center.y -= 1;
+            }
+            ifJump -= 1;
+        }
+        if (ifJump == 0 && ifJumpBack > 0) {
+            center.y += 1;
+            ifJumpBack -= 1;
+        }
+        if (ifJump == 0 && ifJumpBack == 0) {
+            ifJump = -10000;
+            ifJumpBack = -10000;
+        }
+
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void moveTo(double x, double y) {
+        center.x = (int) x;
+        center.y = (int) y;
+    }
+
+    public void setShapesWorld(ShapesWorld theWorld) {
+        this.welt = theWorld;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(color);
+        fillTriangle(g, center.x - radius, center.y - radius, radius * 2, radius * 2);
+    }
+
+    public void fillTriangle(Graphics g, double x, double y, double w, double h) {
+        int[] x_coords = {
+            (int)(x + w / 2),
+            (int)(x),
+            (int)(x + w)
+        };
+        int[] y_coords = {
+            (int)(y),
+            (int)(y + h),
+            (int)(y + h)
+        };
+        Polygon p = new Polygon(x_coords, y_coords, 3);
+        g.fillPolygon(p);
+    }
+
+    public Point getCenter() {
+        return center;
+    }
+
+    public void userClicked(double atX, double atY) {
+        this.radius += 2;
+        //this.welt.addShape(new GoAndBack());
+    }
+
+
+
+
+    public boolean contains(double x, double y) {
+        if (y < (center.y - radius) || y > center.y + radius || x < (center.x - radius) || x > (center.x + radius))
+            return false;
+        else
+            return true;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+}
 
 class GoAndBack implements Shape, Animation {
     double radius;
@@ -1025,7 +1146,7 @@ class GoAndBack implements Shape, Animation {
 
 public class ShapesWorld_Main {
     /**
-     * @param args 
+     * @param args
      * has the name of the shape classes, we want to use in the ShapesWorld-object.
      */
     public static void main(String[] args) {
@@ -1035,3 +1156,4 @@ public class ShapesWorld_Main {
         new ShapeFrame(args);
     }
 } // end of class ShapesWorld_Main
+
