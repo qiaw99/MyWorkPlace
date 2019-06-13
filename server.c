@@ -1,3 +1,4 @@
+//Übungsgruppe:Qianli und Nazar
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
