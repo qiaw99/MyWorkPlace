@@ -26,12 +26,28 @@ static void print_usage () {
 
 
 static int init_unix_socket (char *addr) {
+    struct sockaddr_in saddr;
+    int fd;
 
+    memset(&saddr, '0', sizeof(saddr));
+
+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0) {
+        LOGE("Error during socket creation %s'n", strerror(errno));
+        return -1;
+    }
+
+    if (bind(fd, (struct sockaddr *)&saddr, sizeof(saddr))) {
+        LOGE("Error during socket creation %s'n", strerror(errno));
+        close(fd);
+        return -1;
+    }
+
+    return fd;
 }
 
 static int init_inet_socket (int type) {
     struct sockaddr_in sockaddrin;
-    //struct hostent *host;
     int fd;
 
     if (type != SOCK_STREAM && type != SOCK_DGRAM) {
@@ -45,19 +61,9 @@ static int init_inet_socket (int type) {
         return -1;
     }
 
-  /*  host = gethostbyname(ip);
-    if (host == NULL) {
-        LOGE("|%s| - unknown host.", ip);
-        return -1;
-    } */
     sockaddrin.sin_family = AF_INET;
     sockaddrin.sin_addr.s_addr = inet_addr("127.0.0.1");
     sockaddrin.sin_port = htons(INET_PORT_DEFAULT);
-
-   /* sockaddrin.sin_family = AF_INET;
-    sockaddrin.sin_port = htons(INET_PORT_DEFAULT);
-    memcpy(&sockaddrin.sin_addr, host->h_addr, host->h_length);*/
-
 
     if (connect(fd, (struct sockaddr*)&sockaddrin, sizeof(sockaddrin)) != 0) {
             printf("connection with the server failed...\n");
@@ -68,11 +74,8 @@ static int init_inet_socket (int type) {
 }
 
 int main (int argc, char* argv []) {
-    FILE *hFile;
-    size_t file_size;
-    int c;
-    int char_read = 0;
-    unsigned char *file_content;
+    char buff[2];
+    ssize_t char_read = 0;
     int fd = -1;
     if (argc != 4 || argv[1][0] != '-') {
         print_usage();
@@ -107,48 +110,11 @@ int main (int argc, char* argv []) {
         return -1;
     }
 
-    hFile = fdopen(fd, "rb");
-    if(!hFile) {
-        LOGE("This should not happen");
-        return -1;
-    }
-/*
-    fseek(hFile, 0L, SEEK_END);
-    file_size = (size_t)ftell(hFile);
-    printf("filesize is %zu\n", file_size);
-    rewind(hFile);
-
-    file_content = malloc(file_size);
-    if (!file_content) {
-        LOGE("Run out of memory");
-        fclose(hFile);
-        return -1;
+    char_read = read (fd, buff, sizeof(buff));
+    while (char_read > 0) {
+        fwrite (buff, (unsigned long)char_read, 1,stdout);
+        char_read = read (fd, buff, sizeof(buff));
     }
 
-    fscanf(hFile, "%d", &size);
-    if (fgetc(hFile) != '#') {
-        LOGE("something went wrong\n");
-        return -1;
-    } */
-    while ((c = fgetc(hFile)) != EOF) {
-            fputc(c, stdout);
-            char_read++;
-    }
-
-    /*
-    if ((size_t)char_read != file_size) {
-        LOGE("\n\nFailed to get the whole answer from server\n");
-        return -1;
-    }
-
-
-    free(file_content); */
-
-
-
-    /*
-    write(fd, argv[3], sizeof(argv[3]));
-    read(fd, buff, sizeof (buff));
-    printf("%c\n\n\n\n", buff[1]); */
     return 0;
 }
