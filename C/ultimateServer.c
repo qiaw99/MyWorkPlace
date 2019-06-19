@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 
     switch (argv[1][1]) {
         case 'U':
-            LOGI("Starting UNIX socket with adress %s ...", argv[2]);
+            LOGI("Starting UNIX with %s adress...", argv[2]);
             fd = init_unix_socket(argv[2]);
             break;
         case 'u':
@@ -227,11 +227,16 @@ int main(int argc, char *argv[]) {
         LOGE("Error happened. Leaving...");
         return -1;
     }
-
-    if (listen(fd, 1)) {
-        LOGE("listen err = %s", strerror(errno));
-        close(fd);
+    if (argv[1][1] == 'U' || argv[1][1] == 't') {
+        if (listen(fd, 1)) {
+            LOGE("listen err = %s", strerror(errno));
+            close(fd);
+        }
     }
+    else {
+        if ()
+    }
+    
 
     while (1) {
         int session_fd = accept(fd, NULL, NULL);
@@ -247,34 +252,4 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-/*static int init_inet_socket (char *ip, int type) {
-    struct sockaddr_in sockaddrin;
-    struct hostent *host;
-    int fd;
 
-    if (type != SOCK_STREAM || type != SOCK_DGRAM) {
-        LOGE("Illegal socket type");
-        return -1;
-    }
-
-    if (ip[0] == ' ')
-        ip++;
-
-    fd = socket(AF_INET, type, 0);
-    if (fd == -1) {
-        LOGE("Socket Error %s", strerror(errno));
-        return -1;
-    }
-
-    host = gethostbyname(ip);
-    if (host == NULL) {
-        LOGE("|%s| - unknown host.", ip);
-        return -1;
-    }
-
-    sockaddrin.sin_family = AF_INET;
-    sockaddrin.sin_port = htons(INET_PORT_DEFAULT);
-    memcpy(&sockaddrin.sin_addr, host->h_addr, host->h_length);
-
-    return 0;
-}*/
