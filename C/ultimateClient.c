@@ -68,9 +68,12 @@ static int init_inet_socket (int type) {
 }
 
 int main (int argc, char* argv []) {
-
+    FILE *hFile;
+    size_t file_size;
+    int c;
+    int char_read = 0;
+    unsigned char *file_content;
     int fd = -1;
-
     if (argc != 4 || argv[1][0] != '-') {
         print_usage();
         return -1;
@@ -99,7 +102,53 @@ int main (int argc, char* argv []) {
         return -1;
     }
 
-    write(fd, argv[3], sizeof(argv[3]));
+    if( write(fd, argv[3], sizeof(argv[3])) != sizeof (argv[3])) {
+        LOGE("Failed to send folder/file_path\n");
+        return -1;
+    }
 
+    hFile = fdopen(fd, "rb");
+    if(!hFile) {
+        LOGE("This should not happen");
+        return -1;
+    }
+/*
+    fseek(hFile, 0L, SEEK_END);
+    file_size = (size_t)ftell(hFile);
+    printf("filesize is %zu\n", file_size);
+    rewind(hFile);
+
+    file_content = malloc(file_size);
+    if (!file_content) {
+        LOGE("Run out of memory");
+        fclose(hFile);
+        return -1;
+    }
+
+    fscanf(hFile, "%d", &size);
+    if (fgetc(hFile) != '#') {
+        LOGE("something went wrong\n");
+        return -1;
+    } */
+    while ((c = fgetc(hFile)) != EOF) {
+            fputc(c, stdout);
+            char_read++;
+    }
+
+    /*
+    if ((size_t)char_read != file_size) {
+        LOGE("\n\nFailed to get the whole answer from server\n");
+        return -1;
+    }
+
+
+    free(file_content); */
+
+
+
+    /*
+    write(fd, argv[3], sizeof(argv[3]));
+    read(fd, buff, sizeof (buff));
+    printf("%c\n\n\n\n", buff[1]); */
     return 0;
 }
