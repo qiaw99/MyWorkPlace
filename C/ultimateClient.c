@@ -8,10 +8,10 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <limits.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <linux/limits.h>
 
 #include "log.h"
 
@@ -112,6 +112,9 @@ int main (int argc, char* argv []) {
     }
 
     char_read = read (fd, buff, sizeof(buff));
+    if(!char_read) {
+        LOGE("I DON'T SEE ANYTHING OVER HERE!\n");
+    }
     while (char_read > 0) {
         fwrite (buff, (unsigned long)char_read, 1,stdout);
         char_read = read (fd, buff, sizeof(buff));
@@ -119,137 +122,3 @@ int main (int argc, char* argv []) {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*int client_sock, fd;
-    socklen_t len;
-    struct sockaddr_un server_sockaddr;
-    struct sockaddr_un client_sockaddr;
-    char buf[256];
-    memset(&server_sockaddr, 0, sizeof(struct sockaddr_un));
-    memset(&client_sockaddr, 0, sizeof(struct sockaddr_un));
-
-    client_sock = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (client_sock == -1) {
-        LOGE("SOCKET ERROR = %s\n", strerror(errno));
-        exit(1);
-    }
-
-
-    client_sockaddr.sun_family = AF_UNIX;
-    strcpy(client_sockaddr.sun_path, CLIENT_PATH);
-    len = sizeof(client_sockaddr);
-
-    unlink(CLIENT_PATH);
-    fd = bind(client_sock, (struct sockaddr *) &client_sockaddr, len);
-    if (fd == -1){
-        LOGE("BIND ERROR: %s\n", strerror(errno));
-        close(client_sock);
-        return -1;
-    }
-
-    server_sockaddr.sun_family = AF_UNIX;
-    strcpy(server_sockaddr.sun_path, addr);
-    fd = connect(client_sock, (struct sockaddr *) &server_sockaddr, len);
-    if(fd == -1){
-        LOGE("CONNECT ERROR = %s\n", strerror(errno));
-        close(client_sock);
-        return -1;
-    }
-    return fd;*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* struct sockaddr_un client, server;
-    char buff[2048];
-    socklen_t len;
-    int server_sock, client_sock, fd;
-    ssize_t char_read = 0;
-    if ((server_sock = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        LOGE("Socket error\n");
-        return -1;
-    }
-
-    memset (&client, 0, sizeof(client));
-    server.sun_family = AF_UNIX;
-    strcpy (server.sun_path, addr);
-    len = sizeof(server);
-
-    unlink(addr);
-
-    fd = bind(server_sock, (struct sockaddr *) &server, len);
-    if (fd < 0) {
-        LOGE("Bind error: %s", strerror(errno));
-        close(server_sock);
-        return -1;
-    }
-
-    LOGI("Socket listening\n");
-
-    client_sock = accept(server_sock, (struct sockaddr*)&client, &len);
-    if (client_sock < 0) {
-        LOGE("ACCEPT ERROR: %s", strerror(errno));
-        close (server_sock);
-        close (client_sock);
-        return -1;
-    }
-
-    len = sizeof(client);
-    fd = getpeername(client_sock, (struct sockaddr *)&client, &len);
-    if (fd < 0) {
-        LOGE(" getpeername() error\n");
-        close(server_sock);
-        return -1;
-    }
-    else
-        LOGI("Client socket filepath: %s\n", client.sun_path);
-
-    LOGI("Waiting to rea\n");
-    char_read = read (client_sock, buff, sizeof (buff));
-    if (char_read < 0) {
-        LOGE("Send error\n");
-        close (server_sock);
-        close (client_sock);
-        return -1;
-    }
-    else {
-        LOGI("Data recieved!\n");
-        fwrite (buff, (unsigned long)char_read, 1,stdout);
-    }
-
-    return 0;*/
