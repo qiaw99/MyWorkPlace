@@ -8,9 +8,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <limits.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <linux/limits.h>
 
 #include "log.h"
 
@@ -93,7 +93,6 @@ static int indicate_path_type(const char *path) {
        LOGE("File %s not found.", path);
        return 0;
    }
-
    return S_ISDIR(statbuf.st_mode) ? 1 : 2;
 }
 
@@ -112,13 +111,13 @@ static int send_file_content(int fd, char *path) {
 
     file_content = malloc(file_size);
     if (!file_content) {
-        LOGE("Run out of memory");
+        LOGE("Run out of memory\n");
         fclose(hFile);
         return -1;
     }
 
     if (fread(file_content, sizeof(unsigned char), file_size, hFile) != file_size) {
-        LOGE("Faled to read the file %s path", path);
+        LOGE("Faled to read the file %s path\n", path);
         fclose(hFile);
         free(file_content);
         return -1;
@@ -127,7 +126,7 @@ static int send_file_content(int fd, char *path) {
     fclose(hFile);
 
     if (write(fd, file_content, file_size) != (ssize_t)file_size) {
-        LOGE("Failed to send data");
+        LOGE("Failed to send data\n");
         free(file_content);
         return -1;
     }
@@ -140,11 +139,13 @@ static int send_file_content(int fd, char *path) {
 static int send_dir_info (int fd, char *path) {
     DIR *d = opendir(path);
     if (d) {
+        char backSpace[2] = "\n";
         struct dirent *dir = readdir(d);
 
         while (dir!= NULL) {
-            if (write(fd, dir->d_name, strlen(dir->d_name) != strlen(dir->d_name)))
-                LOGE("Failed to write data to a socket");
+            printf("%s \n", dir->d_name);
+            if (write(fd, dir->d_name, strlen(dir->d_name)) != (ssize_t)strlen(dir->d_name) || write(fd, backSpace, strlen(backSpace)) != (ssize_t)strlen(backSpace))
+                LOGE("Failed to write data to a socket\n");
 
             dir = readdir(d);
         }
@@ -152,7 +153,7 @@ static int send_dir_info (int fd, char *path) {
         closedir(d);
     }
     else {
-        LOGE("This should not happen");
+        LOGE("This should not happen\n");
         return -1;
     }
     return 0;
@@ -162,13 +163,13 @@ static int send_not_found (int fd, char *path) {
     size_t data_len = strlen(path) + strlen(NOT_FOUND_RESPONSE);
     char *data = malloc(data_len);
     if (!data) {
-       LOGE("Run out of memory");
+       LOGE("Run out of memory\n");
        return -1;
     }
 
     sprintf(data, "%s%s", NOT_FOUND_RESPONSE, path);
     if (write(fd, data, data_len) != (ssize_t)data_len) {
-        LOGE("Failed to send response");
+        LOGE("Failed to send response\n");
         return -1;
     }
 
@@ -181,17 +182,17 @@ static int handle_input_connection(int fd) {
     pfn_sent_response response_fn;
 
     if (len <= 0 || len == sizeof(path)) {
-        LOGE("Something went wrong. Read returned %zu", len);
+        LOGE("Something went wrong. Read returned %zu\n", len);
         return -1;
     }
 
     response_fn = response_funtions[indicate_path_type(path)];
 
     if (response_fn(fd, path)) {
-        LOGE("Response function failed");
+        LOGE("Response function failed\n");
     }
     else
-        LOGI("Response sent");
+        LOGI("Response sent\n");
 
     close(fd);
     return 0;
@@ -254,5 +255,25 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+
+/*struct dirent *ptr;
+    DIR *dir = opendir(path);
+    if(dir == NULL){
+        fprintf (stderr,"Error when opening the folder!\n");
+        return -1;
+    }
+    LOGI("The content is: \n");
+    while ((ptr = readdir(dir)) != NULL) {
+        if (strcmp(ptr->d_name,".") == 0 || strcmp(ptr->d_name,"..") == 0) {
+            continue;
+        }
+        else {
+            if (write(fd, ptr->d_name, strlen(ptr->d_name) != strlen(ptr->d_name)))
+                LOGE("Failed to write data to a socket");
+        }
+    }
+    closedir(dir);
+    return 0;*/
 
 
