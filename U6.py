@@ -16,3 +16,5 @@ def mersenne(k):
 
 k=int(input("Wie ist die Eingabe?\n"))
 print("Das Ergebnis ist:",mersenne(k))
+
+https://www.ibm.com/support/knowledgecenter/en/SSB23S_1.1.0.14/gtpc1/unixsock.html
