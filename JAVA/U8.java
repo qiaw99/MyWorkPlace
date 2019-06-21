@@ -1,9 +1,9 @@
 import java.sql.Time;
-import java.util.Iterator;
+
 
 class NotEnoughFuelException extends Exception{
-    private String retCd;	
-    private String msgDes;	
+    private String retCd;
+    private String msgDes;
     public NotEnoughFuelException(){
         super();
     }
@@ -25,8 +25,8 @@ class NotEnoughFuelException extends Exception{
 }
 
 class NotEnoughCapacityException extends Exception{
-    private String retCd;	
-    private String msgDes;	
+    private String retCd;
+    private String msgDes;
     public NotEnoughCapacityException(){
         super();
     }
@@ -48,8 +48,8 @@ class NotEnoughCapacityException extends Exception{
 }
 
 class EmptyQueueException extends Exception{
-    private String retCd;	
-    private String msgDes;	
+    private String retCd;
+    private String msgDes;
     public EmptyQueueException(){
         super();
     }
@@ -70,15 +70,60 @@ class EmptyQueueException extends Exception{
     }
 }
 
-class Driver <T>{
-    private Driver<T> driver;
+class NoMoreElementsException extends Exception{
+    private String retCd;
+    private String msgDes;
+    public NoMoreElementsException(){
+        super();
+    }
+    public NoMoreElementsException(String message){
+        super(message);
+        msgDes=message;
+    }
+    public NoMoreElementsException(String retCd, String msgDes){
+        super();
+        this.retCd=retCd;
+        this.msgDes=msgDes;
+    }
+    public String getRetCd(){
+        return this.retCd;
+    }
+    public String getMsgDes(){
+        return this.msgDes;
+    }
+}
+class TestDriver{
+    public static void test() throws Exception{
+        first f=new first();
+        Driver d = new Driver(f);
+        System.out.println(d.drive(100,20));
+    }
+}
+class Driver{
     private Vehicle v;
-    //private Vehicle[] cars;
+    private Vehicle[] cars;
+    private String[] classes;
+    public Driver(){}
+    public static int i;
+    public Driver(Vehicle v){
+        this.v=v;
+        this.i=0;
+        cars[0]=v;
+        classes[0]=v.Klasse;
+    }
+    public void addCar(Vehicle v){
+        i++;
+        cars[i]=v;
+        this.addClass(v);
+    }
+    public void addClass(Vehicle v){
+        classes[i]=v.Klasse;
+    }
     public Time drive(int km,int speed) throws NotEnoughFuelException{
         if(v.isEmpty()){
             throw new NotEnoughFuelException("Not enough fuel!");
         }
-        v.Rest-=km/(double)speed*v.liter;
+        v.Rest-=km/(double)speed*v.Liter;
         return new Time(km/speed);
     }
     public int tankUp(){
@@ -94,13 +139,13 @@ class Driver <T>{
 }
 
 abstract class Vehicle{
-    public int Klasse;
+    public String Klasse;
     public String Marke;
     public double Groesse;
     public double Liter;
     public double Rest;
     public Vehicle(){}
-    public Vehicle(int Klasse,String Marke,double Groesse,double Liter,double Rest){
+    public Vehicle(String Klasse,String Marke,double Groesse,double Liter,double Rest){
         this.Klasse=Klasse;
         this.Marke=Marke;
         this.Groesse=Groesse;
@@ -128,11 +173,7 @@ class first extends Vehicle{
         return Rest==0.0;
     }
     public boolean isFull(){
-        if (Rest== Groesse){    // 1 -> Full
-            return 1;
-        }else{                  // 0 -> not Full
-            return 0;
-        }
+        return Rest == Groesse;
     }
 }
 
@@ -153,18 +194,14 @@ class second extends Vehicle{
         return Rest==0.0;
     }
     public boolean isFull(){
-        if (Rest== Groesse){    // 1 -> Full
-            return 1;
-        }else{                  // 0 -> not Full
-            return 0;
-        }
+        return Rest== Groesse;
     }
 }
 class TestVehicle{
     public void test(){
         first f=new first();
         second s=new second();
-        
+
     }
 }
 
@@ -193,11 +230,12 @@ interface Queue<T>{
 }
 
 //Warteschlange implementieren
-class ListQueue <T> implements Queue <T> {
+class ListQueue <T> implements Queue <T>,Iterable<T> {
     private ListNode <T> head;
     private ListNode <T> current;
     public ListQueue(){
         this.head = null;
+        this.current=null;
     }
     public boolean empty() {
         return (this.head == null);
@@ -206,11 +244,11 @@ class ListQueue <T> implements Queue <T> {
         if(empty())
             head = new ListNode <T> (newElement);
         else {
-			current = head;	
-            while (current.next != null) 
-				current = current.next;
-			current.next = new ListNode <T> (newElement);
-		}
+            current = head;
+            while (current.next != null)
+                current = current.next;
+                current.next = new ListNode <T> (newElement);
+            }
     }
     public T dequeue() throws EmptyQueueException {
         if (empty())
@@ -224,7 +262,7 @@ class ListQueue <T> implements Queue <T> {
             throw new EmptyQueueException("List is empty. There is no head!");
         return head.element;
     }
-    public String toString(){	
+    public String toString(){
         this.current=this.head;
         String s = "";
         while (this.current != null) {
@@ -233,34 +271,37 @@ class ListQueue <T> implements Queue <T> {
         }
         return s;
     }
+    public Iterator<T> iterator(){
+        return new QueueIterator();
+    }
+    class QueueIterator implements Iterator<T>{
+        ListNode<T> current;
+        public QueueIterator(){
+            current=head;
+        }
+        public boolean hasNext(){
+            return current.next!=null;
+        }
+        public T next() throws NoMoreElementsException{
+            if(hasNext())
+                return current.next.element;
+            else
+                throw new NoMoreElementsException("There are no more  elements!");
+        }
+    }
 }
 
 interface Iterator<T>{
     public boolean hasNext();
-    public T next();
-    class QueueIterator implements Iterable<QueueIterator>{
-        public Iterator<QueueIteratot> iterator(){
-            return new MyIterator();
-        }
-        class MyIterator implements Iterator<QueueIterator>{
-            ListQueue <String> str = new ListQueue <String>();
-            ListQueue <String> st=str;
-            public boolean hasNext(){
-                return;
-            }
-            public T next(){
-                return ;
-            }
-        }
-    }
+    public T next() throws NoMoreElementsException;
 }
 
 interface Iterable<E>{
     Iterator<E> iterator();
 }
 
-class TestListQueue throws Exception{
-    public static void test(){
+class TestListQueue{
+    public static void test() throws Exception{
         ListQueue <String> str = new ListQueue <String>();
         str.enqueue("Hello");
         str.enqueue("1");
@@ -270,7 +311,7 @@ class TestListQueue throws Exception{
         str.enqueue("5");
         str.enqueue("6");
         System.out.println("Here is the queue: ");
-        System.out.println(str.toSting());
+        System.out.println(str.toString());
         System.out.println("Dequeue: "+str.dequeue());
         System.out.println("Dequeue: "+str.dequeue());
     }
@@ -278,6 +319,7 @@ class TestListQueue throws Exception{
 public class U8{
     public static void main(String args[]) throws Exception{
         TestListQueue.test();
+        TestDriver.test();
     }
 }
 
