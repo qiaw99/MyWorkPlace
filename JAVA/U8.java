@@ -1,3 +1,8 @@
+/*
+1.Driver类为什么需要使用泛型？
+2.对象数组应该怎么添加新元素啊，或者有其他解决方法吗？ Aufgabe 1 a） #添加驾驶车辆的等级；
+3.方法drive（）还不能完全实现，明明设置了足够的油量，但是还是报错（自己定义的Exception） 125，126行 #是不是引用传递的地方写错了？
+*/
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
@@ -94,17 +99,22 @@ class NoMoreElementsException extends Exception{
 
 class TestDriver{
     public static void test() throws Exception{
-        first f = new first();
+        Vehicle f = new first();
         System.out.println(f.getInfo());
         Driver d = new Driver(f);
         System.out.println("If drivses the car 100km with 60 km/h, the needed time:");
-        System.out.println(d.drive(100,60));
-        System.out.println(f.getInfo());
+        try{
+        	System.out.println(d.drive(10,60));
+        }catch(Exception e){
+        	e.printStackTrace();
+        }finally{
+        	System.out.println(f.getInfo());
+        }
     }
 }
 
 class Driver{
-    public static Vehicle v;
+    public Vehicle v;
     private Vehicle[] cars;
     private String[] classes;
     public Driver(){}
@@ -124,12 +134,13 @@ class Driver{
         classes[i]=v.Klasse;
     }
     public Time drive(int km,int speed) throws NotEnoughFuelException{
-        if(this.v.isEmpty()){
-            throw new NotEnoughFuelException("Not enough fuel!");
-        }
-        this.v.Rest-=km/(double)speed*this.v.Liter;
         int a;
         double b;
+        this.v.Rest-=km*this.v.Liter;
+        if(this.v.Rest<=0){
+            throw new NotEnoughFuelException("Not enough fuel!");
+        }
+        v.setRest(this.v.Rest);
         if(km/speed>0){
         	a=km/speed;
         }else{
@@ -168,8 +179,15 @@ abstract class Vehicle{
         this.Liter=Liter;
         this.Rest=Rest;
     }
+    public void setRest(double Rest){
+    	this.Rest=Rest;
+    }
     public abstract boolean isEmpty();
     public abstract boolean isFull();
+    public String getInfo(){
+    	return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
+    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;   			
+    }
 }
 
 class first extends Vehicle{
@@ -191,10 +209,12 @@ class first extends Vehicle{
     public boolean isFull(){
         return Rest == Groesse;
     }
+    public void setRest(double Rest){
+    	this.Rest=Rest;
+    }
     public String getInfo(){
     	return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
-    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;
-    			
+    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;   			
     }
 }
 
@@ -223,7 +243,7 @@ class TestVehicle{
         Vehicle f=new first();
         Vehicle s=new second();
         Driver d=new Driver(f);
-        System.out.println(d.drive(100,20));
+        System.out.println(d.drive(10,20));
     }
 }
 
