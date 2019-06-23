@@ -8,13 +8,18 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <limits.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <linux/limits.h>
 
 #include "log.h"
 
 #define INET_PORT_DEFAULT 8080
+#define CLIENT_PATH "tpf_unix_sock.client"
+
+struct sockaddr_in connect_addr;
+socklen_t addrlen;
 
 static void print_usage () {
     printf("\nUsage:\n");
@@ -26,23 +31,22 @@ static void print_usage () {
 
 
 static int init_unix_socket (char *addr) {
-    struct sockaddr_in saddr;
+    struct sockaddr_un saddr;
     int fd;
 
-    memset(&saddr, '0', sizeof(saddr));
-
-    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd < 0) {
-        LOGE("Error during socket creation %s'n", strerror(errno));
+    if ( (fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        LOGE("Socket Error: %s", strerror(errno));
         return -1;
     }
 
-    if (bind(fd, (struct sockaddr *)&saddr, sizeof(saddr))) {
-        LOGE("Error during socket creation %s'n", strerror(errno));
-        close(fd);
+    memset(&saddr, 0, sizeof(saddr));
+    saddr.sun_family = AF_UNIX;
+    strncpy(saddr.sun_path, addr, sizeof(saddr.sun_path));
+
+    if (connect(fd, (struct sockaddr*)&saddr, sizeof(saddr))) {
+        printf("connection with the server failed...\n");
         return -1;
     }
-
     return fd;
 }
 
@@ -57,7 +61,7 @@ static int init_inet_socket (int type) {
 
     fd = socket(AF_INET, type, 0);
     if (fd == -1) {
-        LOGE("Socket Error %s", strerror(errno));
+        LOGE("Socket Error: %s", strerror(errno));
         return -1;
     }
 
@@ -65,9 +69,9 @@ static int init_inet_socket (int type) {
     sockaddrin.sin_addr.s_addr = inet_addr("127.0.0.1");
     sockaddrin.sin_port = htons(INET_PORT_DEFAULT);
 
-    if (connect(fd, (struct sockaddr*)&sockaddrin, sizeof(sockaddrin)) != 0) {
+    if (connect(fd, (struct sockaddr*)&sockaddrin, sizeof(sockaddrin))) {
             printf("connection with the server failed...\n");
-            exit(0);
+            return -1;
         }
 
     return fd;
@@ -81,6 +85,11 @@ int main (int argc, char* argv []) {
         print_usage();
         return -1;
     }
+
+    connect_addr.sin_family = AF_INET;
+    connect_addr.sin_port = htons(INET_PORT_DEFAULT);
+    connect_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addrlen = sizeof(connect_addr);
 
     switch (argv[1][1]) {
         case 'U':
@@ -104,16 +113,18 @@ int main (int argc, char* argv []) {
         LOGE("Error happened. Leaving...");
         return -1;
     }
-
-    if( write(fd, argv[3], sizeof(argv[3])) != sizeof (argv[3])) {
+    if (sendto (fd, argv[3], strlen(argv[3]), 0, (struct sockaddr*)&connect_addr, addrlen) != strlen (argv[3])) {
         LOGE("Failed to send folder/file_path\n");
         return -1;
     }
 
-    char_read = read (fd, buff, sizeof(buff));
+    char_read = recvfrom (fd, buff, sizeof(buff), 0, (struct sockaddr*)&connect_addr, &addrlen);
+    if(!char_read) {
+        LOGE("I DON'T SEE ANYTHING OVER HERE!\n");
+    }
     while (char_read > 0) {
         fwrite (buff, (unsigned long)char_read, 1,stdout);
-        char_read = read (fd, buff, sizeof(buff));
+        char_read = recvfrom (fd, buff, sizeof(buff), 0, (struct sockaddr*)&connect_addr, &addrlen);
     }
 
     return 0;
