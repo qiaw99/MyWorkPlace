@@ -1,6 +1,5 @@
 import java.sql.Time;
 
-
 class NotEnoughFuelException extends Exception{
     private String retCd;
     private String msgDes;
@@ -92,15 +91,20 @@ class NoMoreElementsException extends Exception{
         return this.msgDes;
     }
 }
+
 class TestDriver{
     public static void test() throws Exception{
-        first f=new first();
+        first f = new first();
+        System.out.println(f.getInfo());
         Driver d = new Driver(f);
-        System.out.println(d.drive(100,20));
+        System.out.println("If drivses the car 100km with 60 km/h, the needed time:");
+        System.out.println(d.drive(100,60));
+        System.out.println(f.getInfo());
     }
 }
+
 class Driver{
-    private Vehicle v;
+    public static Vehicle v;
     private Vehicle[] cars;
     private String[] classes;
     public Driver(){}
@@ -108,8 +112,8 @@ class Driver{
     public Driver(Vehicle v){
         this.v=v;
         this.i=0;
-        cars[0]=v;
-        classes[0]=v.Klasse;
+        //cars[0]=v;
+        //classes[0]=v.Klasse;
     }
     public void addCar(Vehicle v){
         i++;
@@ -120,11 +124,23 @@ class Driver{
         classes[i]=v.Klasse;
     }
     public Time drive(int km,int speed) throws NotEnoughFuelException{
-        if(v.isEmpty()){
+        if(this.v.isEmpty()){
             throw new NotEnoughFuelException("Not enough fuel!");
         }
-        v.Rest-=km/(double)speed*v.Liter;
-        return new Time(km/speed);
+        this.v.Rest-=km/(double)speed*this.v.Liter;
+        int a;
+        double b;
+        if(km/speed>0){
+        	a=km/speed;
+        }else{
+        	a=0;
+        }
+        b=(km/(double)speed-a)*60;
+        Time time=new Time(0);
+        time.setHours(a);
+        time.setMinutes((int)b);
+        time.setSeconds(0);
+        return time;
     }
     public int tankUp(){
         v.Rest=v.Groesse;
@@ -175,6 +191,11 @@ class first extends Vehicle{
     public boolean isFull(){
         return Rest == Groesse;
     }
+    public String getInfo(){
+    	return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
+    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;
+    			
+    }
 }
 
 class second extends Vehicle{
@@ -198,10 +219,11 @@ class second extends Vehicle{
     }
 }
 class TestVehicle{
-    public void test(){
-        first f=new first();
-        second s=new second();
-
+    public void test() throws Exception{
+        Vehicle f=new first();
+        Vehicle s=new second();
+        Driver d=new Driver(f);
+        System.out.println(d.drive(100,20));
     }
 }
 
@@ -286,7 +308,7 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
             if(hasNext())
                 return current.next.element;
             else
-                throw new NoMoreElementsException("There are no more  elements!");
+                throw new NoMoreElementsException("There are no more elements!");
         }
     }
 }
@@ -303,25 +325,49 @@ interface Iterable<E>{
 class TestListQueue{
     public static void test() throws Exception{
         ListQueue <String> str = new ListQueue <String>();
+        
+        System.out.println("Enqueue with element \"Hello\"");
         str.enqueue("Hello");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"1\"");
         str.enqueue("1");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"2\"");
         str.enqueue("2");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"3\"");
         str.enqueue("3");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"4\"");
         str.enqueue("4");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"5\"");
         str.enqueue("5");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("Enqueue with element \"6\"");
         str.enqueue("6");
-        System.out.println("Here is the queue: ");
+        System.out.println("Queue now: "+str.toString());
+
+        System.out.println("The queue is: ");
         System.out.println(str.toString());
         System.out.println("Dequeue: "+str.dequeue());
         System.out.println("Dequeue: "+str.dequeue());
+        System.out.println("Now head is: "+str.head());
     }
 }
+
 public class U8{
     public static void main(String args[]) throws Exception{
-        TestListQueue.test();
+    	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
+        System.out.println("**************Aufgabe 2*************");
+        TestListQueue.test();
+    	
     }
 }
-
-
-
