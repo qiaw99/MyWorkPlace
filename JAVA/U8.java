@@ -1,8 +1,4 @@
-/*
-1.Driver类为什么需要使用泛型？
-2.对象数组应该怎么添加新元素啊，或者有其他解决方法吗？ Aufgabe 1 a） #添加驾驶车辆的等级；
-3.方法drive（）还不能完全实现，明明设置了足够的油量，但是还是报错（自己定义的Exception） 125，126行 #是不是引用传递的地方写错了？
-*/
+
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
