@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<unistd.h>
 
 char *MakeCRC(char *BitString){
 	static char Res[17];
@@ -34,13 +35,45 @@ char *MakeCRC(char *BitString){
 	Res[16]=0;
 	return Res;
 }
-
+void check (FILE* fd){
+	char buffer[1024];
+	
+}
 int main(int argc, char *argv[]){
+	if(argc!=2){
+		fprintf(stderr,"Incorrect arguments!\n");
+	}else{
+		int l=(int)strlen(argv[1]);
+		FILE *fd=fopen(argv[1],"rb");
+		if(argv[1][l]=='c'){
+			if(argv[1][l-1]=='r'){
+				if(argv[1][l-2]=='c'){
+					if(argv[1][l-3]=='.'){
+
+					}
+				}
+			}
+		}
+		check(fd);
+		
+	}
 	char*Data,*Result;
 	Data="0011111101111110";
 	Result=MakeCRC(Data);
 	printf("CRC of [%s] is [%s] with P=[11000000000000101]\n",Data,Result);
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
