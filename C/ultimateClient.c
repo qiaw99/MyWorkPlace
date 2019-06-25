@@ -72,23 +72,22 @@ static int init_inet_socket (int type) {
     if (connect(fd, (struct sockaddr*)&sockaddrin, sizeof(sockaddrin))) {
             printf("connection with the server failed...\n");
             return -1;
-        }
+    }
 
     return fd;
 }
 
 int main (int argc, char* argv []) {
-    char buff[2];
+    char buff[4048];
     ssize_t char_read = 0;
     int fd = -1;
     if (argc != 4 || argv[1][0] != '-') {
         print_usage();
         return -1;
     }
-
     connect_addr.sin_family = AF_INET;
+    connect_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     connect_addr.sin_port = htons(INET_PORT_DEFAULT);
-    connect_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addrlen = sizeof(connect_addr);
 
     switch (argv[1][1]) {
@@ -123,7 +122,7 @@ int main (int argc, char* argv []) {
         LOGE("I DON'T SEE ANYTHING OVER HERE!\n");
     }
     while (char_read > 0) {
-        fwrite (buff, (unsigned long)char_read, 1,stdout);
+        fwrite (buff, (unsigned long)char_read, 1, stdout);
         char_read = recvfrom (fd, buff, sizeof(buff), 0, (struct sockaddr*)&connect_addr, &addrlen);
     }
 
