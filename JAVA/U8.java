@@ -104,11 +104,11 @@ class TestDriver{
         Driver d = new Driver(f);
         System.out.println("If drivses the car 100km with 60 km/h, the needed time:");
         try{
-                System.out.println(d.drive(10,60));
+        	System.out.println(d.drive(10,60));
         }catch(Exception e){
-                e.printStackTrace();
+        	e.printStackTrace();
         }finally{
-                System.out.println(f.getInfo());
+        	System.out.println(f.getInfo());
         }
     }
 }
@@ -142,9 +142,9 @@ class Driver{
         }
         v.setRest(this.v.Rest);
         if(km/speed>0){
-                a=km/speed;
+        	a=km/speed;
         }else{
-                a=0;
+        	a=0;
         }
         b=(km/(double)speed-a)*60;
         Time time=new Time(0);
@@ -180,13 +180,13 @@ abstract class Vehicle{
         this.Rest=Rest;
     }
     public void setRest(double Rest){
-        this.Rest=Rest;
+    	this.Rest=Rest;
     }
     public abstract boolean isEmpty();
     public abstract boolean isFull();
     public String getInfo(){
-        return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
-                        +" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;
+    	return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
+    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;   			
     }
 }
 
@@ -210,11 +210,11 @@ class first extends Vehicle{
         return Rest == Groesse;
     }
     public void setRest(double Rest){
-        this.Rest=Rest;
+    	this.Rest=Rest;
     }
     public String getInfo(){
-        return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
-                        +" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;
+    	return "Klass："+this.Klasse+" Marke: "+this.Marke+"\n"+"Tankgroesse: "+this.Groesse
+    			+" Kilometer pro Liter: "+this.Liter+" Rest oil: "+this.Rest;   			
     }
 }
 
@@ -274,19 +274,13 @@ interface Queue<T>{
 //Warteschlange implementieren
 class ListQueue <T> implements Queue <T>,Iterable<T> {
     private ListNode <T> head;
-    private ListNode <T> tail;
     private ListNode <T> current;
-    private T [] array;
-    public ListeQueue(T[]array){
-        this.head=0;
-        this.tail=0;
-        this.current=0;
-    }
     public ListQueue(){
-        this((T[]) new Object[5]);
+        this.head = null;
+        this.current=null;
     }
     public boolean empty() {
-        return (this.head == this.tail);
+        return (this.head == null);
     }
     public void enqueue(T newElement){
         if(empty())
@@ -351,7 +345,7 @@ interface Iterable<E>{
 class TestListQueue{
     public static void test() throws Exception{
         ListQueue <String> str = new ListQueue <String>();
-
+        
         System.out.println("Enqueue with element \"Hello\"");
         str.enqueue("Hello");
         System.out.println("Queue now: "+str.toString());
@@ -390,10 +384,10 @@ class TestListQueue{
 
 public class U8{
     public static void main(String args[]) throws Exception{
-        System.out.println("**************Aufgabe 1*************");
+    	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
         System.out.println("**************Aufgabe 2*************");
         TestListQueue.test();
-
+    	
     }
 }
