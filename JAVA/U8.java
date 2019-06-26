@@ -376,7 +376,7 @@ class TestListQueue{
     }
 }
 
-public class Stack{
+public class U8{
     public static void main(String args[]) throws Exception{
     	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
