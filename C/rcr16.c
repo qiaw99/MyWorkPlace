@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
     char *last_chars;
     unsigned char *file_content;
     unsigned short sum;
-    char *source_sum;
+    char source_sum;
 
     if (argc > 3 || argc < 2) {
         printf("Invalid arguments!\n");
@@ -99,13 +99,6 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
-    source_sum = malloc (sizeof(char) * 6);
-    if (!source_sum) {
-        printf("Run out of memory\n");
-        fclose(hFile);
-        return -1;
-    }
-
     if (fread(file_content, sizeof(unsigned char), file_size, hFile) != file_size) {
         printf("Failed to read the file %s path\n", argv[1]);
         fclose(hFile);
@@ -119,22 +112,31 @@ int main (int argc, char *argv[]) {
     path_len = strlen(argv[1]);
     last_chars = &argv[1][path_len - 4];
     if (!strcmp(last_chars, ".crc")) {
-        fseek (hFile, -6L - 1L, SEEK_END);                                                          //setting pos to read summary. -1 to make a step from EOF
-        //if (fread (source_sum, sizeof (unsigned char), 6, hFile) != 6) {
+        fseek (hFile, -2L, SEEK_END);                                                          //setting pos to read summary. -1 to make a step from EOF
+        if (fread (&source_sum, sizeof (unsigned short), 1, hFile) != 1) {
             printf("Failed to read CRC16 summary!\n");
             return -1;
-       // }
+        }
+        printf ("summary is %u\n", source_sum);
     }
     else {
+        char *new_name;
+        new_name = malloc (sizeof (argv[1]) + 4);
+        if(!new_name) {
+            printf("Run out of memory!\n");
+            return -1;
+        }
+        sprintf(new_name, "%s.crc", argv[1]);
+
         sum = calculate_sum(file_content, file_size);
         printf ("calculated summary %#8X\n", sum);
         fseek(hFile, 0L, SEEK_END);
-        fwrite (&sum, sizeof (unsigned char), 1, hFile);
-    }/*
+        fwrite(&sum, sizeof (unsigned short), 1, hFile);
+
+        rename(argv[1], new_name);
+        free(new_name);
+    }
     free (file_content);
-    free (source_sum);
-    free (sum);
-    fclose (hFile);*/
     return 0;
 }
 
