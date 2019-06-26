@@ -3,6 +3,7 @@
 #include <linux/limits.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -70,7 +71,7 @@ int main (int argc, char *argv[]) {
     char *last_chars;
     unsigned char *file_content;
     unsigned short sum;
-    char source_sum;
+    unsigned short source_sum;
 
     if (argc > 3 || argc < 2) {
         printf("Invalid arguments!\n");
@@ -105,23 +106,34 @@ int main (int argc, char *argv[]) {
         free(file_content);
         return -1;
     }
-
-
-
-
     path_len = strlen(argv[1]);
     last_chars = &argv[1][path_len - 4];
     if (!strcmp(last_chars, ".crc")) {
-        fseek (hFile, -2L, SEEK_END);                                                          //setting pos to read summary. -1 to make a step from EOF
+        size_t source_file_size = file_size - 2;                                                    //file without check summary at the end
+        fseek (hFile, -2L, SEEK_END);
         if (fread (&source_sum, sizeof (unsigned short), 1, hFile) != 1) {
             printf("Failed to read CRC16 summary!\n");
             return -1;
         }
-        printf ("summary is %u\n", source_sum);
+        printf ("summary is %#8X\n", source_sum);
+        sum = calculate_sum(file_content, source_file_size);
+        printf("summary is %#8X\n", sum);
+        if (sum == source_sum) {
+            char *new_name = malloc(sizeof(argv[1]) - 4);
+            truncate(argv[1], (off_t)source_file_size);
+            strncpy(new_name, argv[1], (sizeof(argv[1]) - 4));                                              //TODO: Renaming doesn't work
+            rename(argv[1], new_name);
+            free(new_name);
+        }
+        else {
+            printf("Check summary is false!\n Error!\n");
+            return -1;
+        }
     }
     else {
         char *new_name;
-        new_name = malloc (sizeof (argv[1]) + 4);
+        new_name = malloc (sizeof (argv[1]) +  4);                                                              //TODO renaming works, but nobody knows why
+        printf("new_name is %d\n",sizeof(new_name));
         if(!new_name) {
             printf("Run out of memory!\n");
             return -1;
