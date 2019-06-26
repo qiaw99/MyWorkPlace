@@ -6,7 +6,19 @@
 #include <stdlib.h>
 #include <stdint.h>
 
- const unsigned short Crc16Table[256] = {
+
+
+/*
+  Name  : CRC-16
+  Poly  : 0x8005    x^16 + x^15 + x^2 + 1
+  Init  : 0xFFFF
+  Revert: true
+  XorOut: 0x0000
+  Check : 0x4B37 ("123456789")
+  MaxLen: 4095 byte
+*/
+
+unsigned short Crc16Table[256] = {
     0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
     0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
     0xCC01, 0x0CC0, 0x0D80, 0xCD41, 0x0F00, 0xCFC1, 0xCE81, 0x0E40,
@@ -41,106 +53,29 @@
     0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
 };
 
-
-unsigned short calculate_sum (unsigned char * pcBlock, unsigned short len) {
+unsigned short *calculate_sum (unsigned char *pcBlock, unsigned long len) {
+    unsigned short *res = malloc (sizeof (unsigned short));
     unsigned short crc = 0xFFFF;
+    if(!res) {
+        printf("Run out of memory\n");
+        return NULL;
+    }
 
     while (len--)
         crc = (crc >> 8) ^ Crc16Table[(crc & 0xFF) ^ *pcBlock++];
 
-    return crc;
-}
-
-
-
-/*
-  Name  : CRC-16
-  Poly  : 0x8005    x^16 + x^15 + x^2 + 1
-  Init  : 0xFFFF
-  Revert: true
-  XorOut: 0x0000
-  Check : 0x4B37 ("123456789")
-  MaxLen: 4095 byte
-
-
-
-
-char *makeCRC(FILE *file){
-    static char *res;
-    char CRC[16] = {0,};
-    int i;
-    char c;
-    char DoInvert;
-    res = malloc (sizeof(char) * 17);
-    if (!res) {
-        printf("Error allocating memory!\n");
-        return NULL;
-    }
-    rewind(file);
-    c = fgetc(file);
-    while (c != EOF) {
-        printf ("%c\n", itoa(c));
-        DoInvert=('1'== c)^CRC[15];
-        CRC[15]=CRC[14]^DoInvert;
-        CRC[14]=CRC[13];
-        CRC[13]=CRC[12];
-        CRC[12]=CRC[11];
-        CRC[11]=CRC[10];
-        CRC[10]=CRC[9];
-        CRC[9]=CRC[8];
-        CRC[8]=CRC[7];
-        CRC[7]=CRC[6];
-        CRC[6]=CRC[5];
-        CRC[5]=CRC[4];
-        CRC[4]=CRC[3];
-        CRC[3]=CRC[2];
-        CRC[2]=CRC[1]^DoInvert;
-        CRC[1]=CRC[0];
-        CRC[0]=DoInvert;
-        c = fgetc(file);
-    }
-    for (i = 0; i < 16; ++i) {
-        res[15-i]=CRC[i] ?'1':'0';
-    }
-    res[16] = 0;
+    res = &crc;
     return res;
 }
 
-*/
-
-/*
-    Poly 0x8005(x^16 + x^15 + x^2 + 1)
-    Init 0x0000
-    RefIn true
-    RefOut true
-    XorOut 0x0000
-*/
-
-/*
-uint16_t crc16_arc(uint8_t *data, uint16_t len)
-{
-   uint16_t crc = 0x0000;
-   for (uint16_t j = len; j > 0; j--)
-   {
-      crc ^= *data++;
-      for (uint8_t i = 0; i < 8; i++)
-      {
-         if (crc & 1)
-            crc = (crc >> 1) ^ 0xA001; // 0xA001 is the reflection of 0x8005
-         else
-            crc >>= 1;
-      }
-   }
-   return (crc);
-}*/
-
 int main (int argc, char *argv[]) {
     FILE *hFile;
-    long file_size;
-    int path_len;
+    size_t file_size;
+    unsigned long path_len;
     char *last_chars;
     unsigned char *file_content;
-    unsigned short sum;
+    unsigned short *sum;
+    char *source_sum;
 
     if (argc > 3 || argc < 2) {
         printf("Invalid arguments!\n");
@@ -149,12 +84,13 @@ int main (int argc, char *argv[]) {
 
     hFile = fopen(argv[1], "rb+");
     if(!hFile) {
-        printf("This should not happen\n");
+        printf("Failed to open file %s\n", argv[1]);
         return -1;
     }
 
     fseek (hFile, 0L, SEEK_END);
-    file_size = ftell (hFile);
+    file_size = (size_t)ftell (hFile);
+    printf("file size is %d\n", (int)file_size);
     if (file_size > 4095) {
         printf ("File is too big to provide CRC Algorhitmus\n");
         return -1;
@@ -168,27 +104,44 @@ int main (int argc, char *argv[]) {
         return -1;
     }
 
+    source_sum = malloc (sizeof(char) * 6);
+    if (!source_sum) {
+        printf("Run out of memory\n");
+        fclose(hFile);
+        return -1;
+    }
+
     if (fread(file_content, sizeof(unsigned char), file_size, hFile) != file_size) {
-        printf("Faled to read the file %s path\n", argv[1]);
+        printf("Failed to read the file %s path\n", argv[1]);
         fclose(hFile);
         free(file_content);
         return -1;
     }
-    file_content = "123456789";
-    sum = calculate_sum(file_content, file_size);
-    printf("sum is %#8X\n", sum);
+
+
+
+
     path_len = strlen(argv[1]);
     last_chars = &argv[1][path_len - 4];
     if (!strcmp(last_chars, ".crc")) {
-        //unsigned char source_sum =
+        fseek (hFile, -6L - 1L, SEEK_END);                                                          //setting pos to read summary. -1 to make a step from EOF
+        //if (fread (source_sum, sizeof (unsigned char), 6, hFile) != 6) {
+            printf("Failed to read CRC16 summary!\n");
+            return -1;
+       // }
     }
     else {
-
-    }
-    free(file_content);
+        sum = calculate_sum(file_content, file_size);
+        printf ("calculated summary %#8X\n", *sum);
+        fseek(hFile, 0L, SEEK_END);
+        fwrite (sum, sizeof (unsigned char), 1, hFile);
+    }/*
+    free (file_content);
+    free (source_sum);
+    free (sum);
+    fclose (hFile);*/
     return 0;
 }
-
 
 
 
