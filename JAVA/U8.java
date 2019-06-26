@@ -1,4 +1,4 @@
-
+package qiaw99;
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
@@ -239,7 +239,7 @@ class TestVehicle{
         Vehicle f=new first();
         Vehicle s=new second();
         Driver d=new Driver(f);
-        System.out.println(d.drive(10,20));
+        System.out.println(d.drive(100,20));
     }
 }
 
@@ -270,23 +270,22 @@ interface Queue<T>{
 //Warteschlange implementieren
 class ListQueue <T> implements Queue <T>,Iterable<T> {
     private ListNode <T> head;
+    private ListNode <T> tail;
     private ListNode <T> current;
     public ListQueue(){
         this.head = null;
         this.current=null;
+        this.tail=null;
     }
     public boolean empty() {
         return (this.head == null);
     }
     public void enqueue(T newElement){
         if(empty())
-            head = new ListNode <T> (newElement);
+            head = tail = new ListNode <T> (newElement);
         else {
-            current = head;
-            while (current.next != null)
-                current = current.next;
-                current.next = new ListNode <T> (newElement);
-            }
+            tail= tail.next=new ListNode<T> (newElement);
+        }
     }
     public T dequeue() throws EmptyQueueException {
         if (empty())
@@ -310,10 +309,10 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
         return s;
     }
     public Iterator<T> iterator(){
-        return new QueueIterator();
+        return new QueueIterator<T>();
     }
-    class QueueIterator implements Iterator<T>{
-        ListNode<T> current;
+    class QueueIterator<E> implements Iterator<T>{
+        ListNode <T> current;
         public QueueIterator(){
             current=head;
         }
@@ -341,7 +340,6 @@ interface Iterable<E>{
 class TestListQueue{
     public static void test() throws Exception{
         ListQueue <String> str = new ListQueue <String>();
-        
         System.out.println("Enqueue with element \"Hello\"");
         str.enqueue("Hello");
         System.out.println("Queue now: "+str.toString());
@@ -378,7 +376,7 @@ class TestListQueue{
     }
 }
 
-public class U8{
+public class Stack{
     public static void main(String args[]) throws Exception{
     	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
