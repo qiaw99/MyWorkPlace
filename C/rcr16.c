@@ -53,19 +53,14 @@ unsigned short Crc16Table[256] = {
     0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
 };
 
-unsigned short *calculate_sum (unsigned char *pcBlock, unsigned long len) {
-    unsigned short *res = malloc (sizeof (unsigned short));
+unsigned short calculate_sum (unsigned char *pcBlock, unsigned long len) {
+
     unsigned short crc = 0xFFFF;
-    if(!res) {
-        printf("Run out of memory\n");
-        return NULL;
-    }
 
     while (len--)
         crc = (crc >> 8) ^ Crc16Table[(crc & 0xFF) ^ *pcBlock++];
 
-    res = &crc;
-    return res;
+    return crc;
 }
 
 int main (int argc, char *argv[]) {
@@ -74,7 +69,7 @@ int main (int argc, char *argv[]) {
     unsigned long path_len;
     char *last_chars;
     unsigned char *file_content;
-    unsigned short *sum;
+    unsigned short sum;
     char *source_sum;
 
     if (argc > 3 || argc < 2) {
@@ -132,9 +127,9 @@ int main (int argc, char *argv[]) {
     }
     else {
         sum = calculate_sum(file_content, file_size);
-        printf ("calculated summary %#8X\n", *sum);
+        printf ("calculated summary %#8X\n", sum);
         fseek(hFile, 0L, SEEK_END);
-        fwrite (sum, sizeof (unsigned char), 1, hFile);
+        fwrite (&sum, sizeof (unsigned char), 1, hFile);
     }/*
     free (file_content);
     free (source_sum);
