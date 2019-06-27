@@ -1,4 +1,3 @@
-package qiaw99;
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
