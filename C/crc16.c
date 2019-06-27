@@ -115,28 +115,26 @@ int main (int argc, char *argv[]) {
             printf("Failed to read CRC16 summary!\n");
             return -1;
         }
-        printf ("summary is %#8X\n", source_sum);
+        printf ("source summary is %#8X\n", source_sum);
         sum = calculate_sum(file_content, source_file_size);
-        printf("summary is %#8X\n", sum);
+        printf("calculated summary is %#8X\n", sum);
         if (sum == source_sum) {
             char *new_name;
             new_name = malloc(path_len - 4);
-            printf("new_name is %d bytes long\n",(int)sizeof(new_name));
             truncate(argv[1], (off_t)source_file_size);
-            memcpy(new_name, argv[1], path_len - 4);                                              //TODO: Renaming doesn't work
+            memcpy(new_name, argv[1], path_len - 4);
             printf("New name is %s\n", new_name);
             rename(argv[1], new_name);
             free(new_name);
         }
         else {
-            printf("Check summary is false!\n Error!\n");
+            printf("Source summary is false!\n Error!\n");
             return -1;
         }
     }
     else {
         char *new_name;
-        new_name = malloc(path_len + 4);                                                        //TODO renaming works, but nobody knows why
-        printf("new_name is %d\n",(int)sizeof(new_name));
+        new_name = malloc(path_len + 4);
         sprintf(new_name, "%s.crc", argv[1]);
         sum = calculate_sum(file_content, file_size);
         printf ("calculated summary %#8X\n", sum);
