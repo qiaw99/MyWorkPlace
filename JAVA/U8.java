@@ -213,11 +213,6 @@ class first extends Vehicle{
 }
 
 class second extends Vehicle{
-    private String Klasse;
-    private String Marke;
-    private double Groesse;
-    private double Liter;
-    private double Rest;
     public second(){
         this.Klasse="B";
         this.Marke="BMW";
@@ -321,6 +316,7 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
         }
         public T next() throws NoMoreElementsException{
         	T temp = current.element;
+    		current=current.next;
         	if(temp==null){
         		throw new NoMoreElementsException("There are no more elements!");
         	}else{
@@ -382,7 +378,7 @@ class TestListQueue{
     }
 }
 
-public class Stack{
+public class U8{
     public static void main(String args[]) throws Exception{
     	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
