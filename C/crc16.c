@@ -119,12 +119,14 @@ int main (int argc, char *argv[]) {
         sum = calculate_sum(file_content, source_file_size);
         printf("summary is %#8X\n", sum);
         if (sum == source_sum) {
-            char new_name[path_len - 4];
+            char *new_name;
+            new_name = malloc(path_len - 4);
             printf("new_name is %d bytes long\n",(int)sizeof(new_name));
             truncate(argv[1], (off_t)source_file_size);
-            strncpy(new_name, argv[1], (size_t)(sizeof(new_name)) - 1);                                              //TODO: Renaming doesn't work
+            memcpy(new_name, argv[1], path_len - 4);                                              //TODO: Renaming doesn't work
             printf("New name is %s\n", new_name);
             rename(argv[1], new_name);
+            free(new_name);
         }
         else {
             printf("Check summary is false!\n Error!\n");
@@ -132,7 +134,8 @@ int main (int argc, char *argv[]) {
         }
     }
     else {
-        char new_name[path_len + 4];                                                          //TODO renaming works, but nobody knows why
+        char *new_name;
+        new_name = malloc(path_len + 4);                                                        //TODO renaming works, but nobody knows why
         printf("new_name is %d\n",(int)sizeof(new_name));
         sprintf(new_name, "%s.crc", argv[1]);
         sum = calculate_sum(file_content, file_size);
@@ -141,6 +144,7 @@ int main (int argc, char *argv[]) {
         fwrite(&sum, sizeof (unsigned short), 1, hFile);
         printf("New name is %s\n", new_name);
         rename(argv[1], new_name);
+        free(new_name);
     }
     free (file_content);
     return 0;
