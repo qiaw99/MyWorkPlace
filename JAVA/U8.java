@@ -105,6 +105,16 @@ class TestDriver{
         }finally{
         	System.out.println(f.getInfo());
         }
+        System.out.println("Is first car empty?");
+        System.out.println(d.v.isEmpty());
+        System.out.println("Tank some oil, 10L for example");
+        d.tank(20);
+        System.out.println(d.v.getInfo());
+        System.out.println("Is the first car full?");
+        System.out.println(d.v.isFull());
+        System.out.println("Then tank up:");
+        d.tankUp();
+        System.out.println(d.v.getInfo());
         Vehicle f2=new second();
         Driver d2=new Driver(f2); 
         System.out.println("*****Second car*****");
@@ -116,6 +126,16 @@ class TestDriver{
         }finally{
         	System.out.println(f2.getInfo());
         }
+        System.out.println("Is second car empty?");
+        System.out.println(d2.v.isEmpty());
+        System.out.println("Tank some oil, 20L for example");
+        d2.tank(20);
+        System.out.println(d2.v.getInfo());
+        System.out.println("Is the second car full?");
+        System.out.println(d2.v.isFull());
+        System.out.println("Then tank up:");
+        d2.tankUp();
+        System.out.println(d2.v.getInfo());
     }
 }
 
