@@ -1,3 +1,4 @@
+
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
@@ -131,7 +132,7 @@ class Driver{
     public Time drive(int km,int speed) throws NotEnoughFuelException{
         int a;
         double b;
-        this.v.Rest-=km*this.v.Liter;
+        this.v.Rest-=km/this.v.Liter;
         if(this.v.Rest<=0){
             throw new NotEnoughFuelException("Not enough fuel!");
         }
@@ -186,11 +187,6 @@ abstract class Vehicle{
 }
 
 class first extends Vehicle{
-    private String Klasse;
-    private String Marke;
-    private double Groesse;
-    private double Liter;
-    private double Rest;
     public first(){
         this.Klasse="B";
         this.Marke="Ford";
@@ -203,6 +199,9 @@ class first extends Vehicle{
     }
     public boolean isFull(){
         return Rest == Groesse;
+    }
+    public double getRest(){
+    	return this.Rest;
     }
     public void setRest(double Rest){
     	this.Rest=Rest;
@@ -242,21 +241,6 @@ class TestVehicle{
     }
 }
 
-//Knoten
-class ListNode<T>{
-    public T element;
-    public ListNode <T> next;
-    public ListNode(){
-        this(null);
-    }
-    public ListNode(T element){
-        this.element=element;
-    }
-    public ListNode(T element,ListNode<T> next){
-        this.element=element;
-        this.next=next;
-    }
-}
 
 interface Queue<T>{
     public void enqueue(T element);
@@ -271,6 +255,23 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
     private ListNode <T> head;
     private ListNode <T> tail;
     private ListNode <T> current;
+    
+    //Knoten
+    class ListNode<T>{
+        private T element;
+        private ListNode <T> next;
+        public ListNode(){
+            this(null);
+        }
+        public ListNode(T element){
+            this.element=element;
+        }
+        public ListNode(T element,ListNode<T> next){
+            this.element=element;
+            this.next=next;
+        }
+    }
+    
     public ListQueue(){
         this.head = null;
         this.current=null;
@@ -307,10 +308,10 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
         }
         return s;
     }
-    public Iterator<T> iterator(){
+    public Iterator<T> iterator(){		/*Iterator-Schnittstelle implementieren*/
         return new QueueIterator<T>();
     }
-    class QueueIterator<E> implements Iterator<T>{
+    class QueueIterator<E> implements Iterator<T>{	/*Innere Klasse*/
         ListNode <T> current;
         public QueueIterator(){
             current=head;
@@ -319,10 +320,12 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
             return current.next!=null;
         }
         public T next() throws NoMoreElementsException{
-            if(hasNext())
-                return current.next.element;
-            else
-                throw new NoMoreElementsException("There are no more elements!");
+        	T temp = current.element;
+        	if(temp==null){
+        		throw new NoMoreElementsException("There are no more elements!");
+        	}else{
+        		return temp;
+        	}
         }
     }
 }
@@ -339,6 +342,7 @@ interface Iterable<E>{
 class TestListQueue{
     public static void test() throws Exception{
         ListQueue <String> str = new ListQueue <String>();
+        Iterator i=str.iterator();
         System.out.println("Enqueue with element \"Hello\"");
         str.enqueue("Hello");
         System.out.println("Queue now: "+str.toString());
@@ -366,7 +370,10 @@ class TestListQueue{
         System.out.println("Enqueue with element \"6\"");
         str.enqueue("6");
         System.out.println("Queue now: "+str.toString());
-
+        
+        for(;i.hasNext();){
+        	System.out.println("Queue: "+i.next());
+        }
         System.out.println("The queue is: ");
         System.out.println(str.toString());
         System.out.println("Dequeue: "+str.dequeue());
@@ -375,7 +382,7 @@ class TestListQueue{
     }
 }
 
-public class U8{
+public class Stack{
     public static void main(String args[]) throws Exception{
     	System.out.println("**************Aufgabe 1*************");
         TestDriver.test();
