@@ -1,4 +1,3 @@
-
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
@@ -96,15 +95,26 @@ class NoMoreElementsException extends Exception{
 class TestDriver{
     public static void test() throws Exception{
         Vehicle f = new first();
-        System.out.println(f.getInfo());
         Driver d = new Driver(f);
-        System.out.println("If drivses the car 100km with 60 km/h, the needed time:");
+        System.out.println("*****First car*****");
+        System.out.println("If drivses the car 1000km with 60 km/h, the needed time:");
         try{
-        	System.out.println(d.drive(10,60));
+        	System.out.println(d.drive(1000,60));
         }catch(Exception e){
         	e.printStackTrace();
         }finally{
         	System.out.println(f.getInfo());
+        }
+        Vehicle f2=new second();
+        Driver d2=new Driver(f2); 
+        System.out.println("*****Second car*****");
+        System.out.println("If drivses the car 1000km with 100 km/h, the needed time:");
+        try{
+        	System.out.println(d.drive(1000,100));
+        }catch(Exception e){
+        	e.printStackTrace();
+        }finally{
+        	System.out.println(f2.getInfo());
         }
     }
 }
@@ -114,12 +124,12 @@ class Driver{
     private Vehicle[] cars;
     private String[] classes;
     public Driver(){}
-    public static int i;
+    public int i;
     public Driver(Vehicle v){
         this.v=v;
         this.i=0;
-        //cars[0]=v;
-        //classes[0]=v.Klasse;
+        //cars[i]=v;
+        //classes[i]=v.Klasse;
     }
     public void addCar(Vehicle v){
         i++;
@@ -312,14 +322,14 @@ class ListQueue <T> implements Queue <T>,Iterable<T> {
             current=head;
         }
         public boolean hasNext(){
-            return current.next!=null;
+            return current!=null;
         }
         public T next() throws NoMoreElementsException{
         	T temp = current.element;
-    		current=current.next;
         	if(temp==null){
         		throw new NoMoreElementsException("There are no more elements!");
         	}else{
+        		current=current.next;
         		return temp;
         	}
         }
