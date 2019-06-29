@@ -1,3 +1,4 @@
+//übungsgruppe: Qianli und Nazar
 import java.sql.Time;
 
 class NotEnoughFuelException extends Exception{
@@ -97,6 +98,8 @@ class TestDriver{
         Vehicle f = new first();
         Driver d = new Driver(f);
         System.out.println("*****First car*****");
+        System.out.println("The attributs of first car before driving:");
+        System.out.println(f.getInfo());
         System.out.println("If drivses the car 1000km with 60 km/h, the needed time:");
         try{
         	System.out.println(d.drive(1000,60));
@@ -108,7 +111,7 @@ class TestDriver{
         System.out.println("Is first car empty?");
         System.out.println(d.v.isEmpty());
         System.out.println("Tank some oil, 10L for example");
-        d.tank(20);
+        d.tank(10);
         System.out.println(d.v.getInfo());
         System.out.println("Is the first car full?");
         System.out.println(d.v.isFull());
@@ -117,10 +120,13 @@ class TestDriver{
         System.out.println(d.v.getInfo());
         Vehicle f2=new second();
         Driver d2=new Driver(f2); 
+        System.out.println();
         System.out.println("*****Second car*****");
+        System.out.println("The attributs of second car before driving:");
+        System.out.println(f2.getInfo());
         System.out.println("If drivses the car 1000km with 100 km/h, the needed time:");
         try{
-        	System.out.println(d.drive(1000,100));
+        	System.out.println(d2.drive(1000,100));
         }catch(Exception e){
         	e.printStackTrace();
         }finally{
@@ -133,8 +139,10 @@ class TestDriver{
         System.out.println(d2.v.getInfo());
         System.out.println("Is the second car full?");
         System.out.println(d2.v.isFull());
-        System.out.println("Then tank up:");
+        System.out.println("Then tank up.");
         d2.tankUp();
+        System.out.println("Is now full?");
+        System.out.println(f2.isFull());
         System.out.println(d2.v.getInfo());
     }
 }
