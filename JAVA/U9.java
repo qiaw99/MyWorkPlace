@@ -25,7 +25,7 @@ class EmptyQueueException extends Exception{
     }
 }
 class FullQueueException extends Exception{
-	private String retCd;
+    private String retCd;
     private String msgDes;
     public FullQueueException(){
         super();
@@ -162,44 +162,44 @@ class TestArrayQueue {
 		simpleQueue <String> str = new simpleQueue <String>();
 		Iterator i=str.iterator();
 		System.out.println("Enqueue with element \"1\"");
-        str.enqueue("1");
-        System.out.println("Queue now: "+str.toString());
+		str.enqueue("1");
+		System.out.println("Queue now: "+str.toString());
 
-        System.out.println("Enqueue with element \"2\"");
-        str.enqueue("2");
-        System.out.println("Queue now: "+str.toString());
+		System.out.println("Enqueue with element \"2\"");
+		str.enqueue("2");
+		System.out.println("Queue now: "+str.toString());
 
-        System.out.println("Enqueue with element \"3\"");
-        str.enqueue("3");
-        System.out.println("Queue now: "+str.toString());
+		System.out.println("Enqueue with element \"3\"");
+		str.enqueue("3");
+		System.out.println("Queue now: "+str.toString());
 
-        System.out.println("Enqueue with element \"4\"");
-        str.enqueue("4");
-        System.out.println("Queue now: "+str.toString());
+		System.out.println("Enqueue with element \"4\"");
+		str.enqueue("4");
+		System.out.println("Queue now: "+str.toString());
 
-        System.out.println("Enqueue with element \"5\"");
-        str.enqueue("5");
-        System.out.println("Queue now: "+str.toString());
+		System.out.println("Enqueue with element \"5\"");
+		str.enqueue("5");
+		System.out.println("Queue now: "+str.toString());
 
-        System.out.println("Enqueue with element \"6\"");
-        str.enqueue("6");
-        System.out.println("Queue now: "+str.toString());
-        System.out.println("See the first element");
-        System.out.println(str.first());
-        System.out.println("What about dequeue?");
-        System.out.println(str.dequeue());
-        System.out.println("The queue now?");
-        System.out.println(str.toString());
-        System.out.println("What about dequeue?");
-        System.out.println(str.dequeue());
-        System.out.println("The queue now?");
-        System.out.println(str.toString());
-        System.out.println("The result using Iterator:");        
-        for(;i.hasNext();){
-            System.out.println("Has next element?");
-            System.out.println(i.hasNext());
-        	System.out.println("The element is: "+i.next());
-        }
+		System.out.println("Enqueue with element \"6\"");
+		str.enqueue("6");
+		System.out.println("Queue now: "+str.toString());
+		System.out.println("See the first element");
+		System.out.println(str.first());
+		System.out.println("What about dequeue?");
+		System.out.println(str.dequeue());
+		System.out.println("The queue now?");
+		System.out.println(str.toString());
+		System.out.println("What about dequeue?");
+		System.out.println(str.dequeue());
+		System.out.println("The queue now?");
+		System.out.println(str.toString());
+		System.out.println("The result using Iterator:");        
+		for(;i.hasNext();){
+		    System.out.println("Has next element?");
+		    System.out.println(i.hasNext());
+		    System.out.println("The element is: "+i.next());
+		}
 	}
 }
 public class U9{
