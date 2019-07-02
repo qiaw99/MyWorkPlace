@@ -3,7 +3,7 @@
 */
 
 class EmptyQueueException extends Exception{
-	private String retCd;
+    private String retCd;
     private String msgDes;
     public EmptyQueueException(){
         super();
