@@ -1,7 +1,6 @@
 /*
 Übungsgruppe: Qianli und Nazar
 */
-package test;
 class EmptyQueueException extends Exception{
     private String retCd;
     private String msgDes;
