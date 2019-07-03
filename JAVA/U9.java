@@ -127,7 +127,7 @@ class simpleQueue<E> implements Queue<E>{
 			}
 			return s;
 		}else{
-			while(current<=tail){
+			while(current<tail){
 				s=s+queue[current]+" ";
 				current++;
 			}
