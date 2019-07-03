@@ -23,6 +23,7 @@ class EmptyQueueException extends Exception{
         return this.msgDes;
     }
 }
+
 class FullQueueException extends Exception{
     private String retCd;
     private String msgDes;
@@ -45,6 +46,7 @@ class FullQueueException extends Exception{
         return this.msgDes;
     }
 }
+
 interface Queue<E>{
 	public void enqueue(E element)throws FullQueueException;
 	public E dequeue() throws EmptyQueueException;
@@ -52,6 +54,7 @@ interface Queue<E>{
 	public boolean empty();
 	public String toString();
 }
+
 interface Iterable<E>{
     Iterator<E> iterator();
 }
@@ -60,11 +63,13 @@ interface Iterator<T>{
     public boolean hasNext();
     public T next();
 }
+
 class simpleQueue<E> implements Queue<E>{
 	private int head;
 	private int tail;
 	private int current;
 	private E[] queue;
+	
 	public simpleQueue(){
 		this((E[]) new Object[10]);		/*assert the length of queue is 10*/
 	}
@@ -133,7 +138,7 @@ class simpleQueue<E> implements Queue<E>{
 			return s;
 		}	
 	}
-	class QueueIterator<T> implements Iterator<E>{	/*Innere Klasse*/
+	private class QueueIterator<T> implements Iterator<E>{	/*Innere Klasse*/
         int current;
         public QueueIterator(){
             current=head;
@@ -156,6 +161,7 @@ class simpleQueue<E> implements Queue<E>{
         return new QueueIterator<E>();
     }
 }
+
 class TestArrayQueue {
 	public static void test() throws Exception{
 		simpleQueue <String> str = new simpleQueue <String>();
@@ -203,9 +209,10 @@ class TestArrayQueue {
 }
 
 class PriorityQueue <P extends Comparable<P>, Data>{
-	int num;
-	Node wurzel;
-	Object [] heap;
+	private int num;
+	private Node wurzel;
+	private Object [] heap;
+	
 	public PriorityQueue(){
 		num=0;
 		wurzel=null;
@@ -225,16 +232,20 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 		return (int)heap[0];
 	}
 	
+	public void dec(Object [] heap){
+		heap[0]=heapsize(heap)-1;
+	}
+	
 	private void maxHeapify(Object [] heap,int pos){
 		int leftT=left(pos);
 		int rightT=right(pos);
 		int biggest;
-		if(leftT<=heapsize(heap) && (((Node)heap[leftT]).priority.compareTo(((Node)heap[pos]).priority))<0){
+		if(leftT<=heapsize(heap) && (((Node)heap[leftT]).priority.compareTo(((Node)heap[pos]).priority))>0){
 			biggest=leftT;
 		}else{
 			biggest=pos;
 		}
-		if(rightT<=heapsize(heap) && (((Node)heap[rightT]).priority.compareTo(((Node)heap[biggest]).priority))<0){
+		if(rightT<=heapsize(heap) && (((Node)heap[rightT]).priority.compareTo(((Node)heap[biggest]).priority))>0){
 			biggest=rightT;
 		}
 		if(biggest!=pos){
@@ -245,9 +256,18 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 			maxHeapify(heap,biggest);
 		}
 	}
+	
+	public void buildPriorityQueue(Object[]heap){
+		int temp=heap.length-1;
+		for(int i=temp/2;i>0;i--){
+			maxHeapify(heap,i);
+		}
+	}
+	
 	public boolean empty(){
 		return wurzel==null;
 	}
+	
 	public Data dequeue() throws EmptyQueueException{
 		if(!empty()){
 			Data temp=((Node)heap[1]).data;
@@ -269,19 +289,27 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 			throw new EmptyQueueException("There is no element in the heap!");
 		}
 	}
+	
 	public void enqueue(P priority, Data data){
 		if(wurzel==null){
-			wurzel.priority=priority;
-			wurzel.data=data;
+			wurzel=new Node(data,priority);
 			heap[1]=wurzel;
 			num++;
 			heap[0]=num;
 		}else{
 			Node temp=new Node(data,priority);
 			heap[(heapsize(heap))+1]=temp;
-			maxHeapify(heap,heapsize(heap)+1);
+			buildPriorityQueue(heap);
 			num++;
 			heap[0]=num;
+		}
+	}
+	
+	public void getInfo(){
+		String s="";
+		System.out.println("There are "+num+" elements in the heap.");
+		for(int i=1;i<=num;i++){
+			System.out.println("Data: "+((Node)heap[i]).data+" Priority: "+((Node)heap[i]).priority);
 		}
 	}
 	
@@ -294,13 +322,21 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 		}
 	}
 }
+
 class SimulateMessageTraffic{
 	public static void test() throws Exception{
 		PriorityQueue<Integer,String> queue=new PriorityQueue<Integer,String>();
+		System.out.println("Is the heap empty?");
+		System.out.println(queue.empty());
 		queue.enqueue(1,"1");
-		System.out.println(queue.toString());
+		queue.enqueue(3,"2");
+		queue.enqueue(4,"6");
+		queue.enqueue(5,"4");
+		System.out.println(queue.highest());
+		queue.getInfo();
 	}
 }
+
 public class U9{
 	public static void main(String args[]) throws Exception{
 		//TestArrayQueue.test();
