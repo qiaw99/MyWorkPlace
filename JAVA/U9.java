@@ -1,7 +1,7 @@
 /*
 Übungsgruppe: Qianli und Nazar
 */
-
+package test;
 class EmptyQueueException extends Exception{
     private String retCd;
     private String msgDes;
@@ -202,9 +202,110 @@ class TestArrayQueue {
 		}
 	}
 }
+
+class PriorityQueue <P extends Comparable<P>, Data>{
+	int num;
+	Node wurzel;
+	Object [] heap;
+	public PriorityQueue(){
+		num=0;
+		wurzel=null;
+		heap=new Object[10];
+		heap[0]=num;
+	}
+	
+	private int left(int pos){
+		return 2*pos;
+	}
+	
+	private int right(int pos){
+		return 2*pos+1;
+	}
+	
+	private int heapsize(Object [] heap){
+		return (int)heap[0];
+	}
+	
+	private void maxHeapify(Object [] heap,int pos){
+		int leftT=left(pos);
+		int rightT=right(pos);
+		int biggest;
+		if(leftT<=heapsize(heap) && (((Node)heap[leftT]).priority.compareTo(((Node)heap[pos]).priority))<0){
+			biggest=leftT;
+		}else{
+			biggest=pos;
+		}
+		if(rightT<=heapsize(heap) && (((Node)heap[rightT]).priority.compareTo(((Node)heap[biggest]).priority))<0){
+			biggest=rightT;
+		}
+		if(biggest!=pos){
+			Node temp;
+			temp=(Node)heap[pos];
+			heap[pos]=heap[biggest];
+			heap[biggest]=temp;
+			maxHeapify(heap,biggest);
+		}
+	}
+	public boolean empty(){
+		return wurzel==null;
+	}
+	public Data dequeue() throws EmptyQueueException{
+		if(!empty()){
+			Data temp=((Node)heap[1]).data;
+			heap[1]=null;
+			maxHeapify(heap,1);
+			num--;
+			heap[0]=num;
+			return temp;
+		}else{
+			throw new EmptyQueueException("There is no element in the heap!");
+		}
+	}
+	
+	public Data highest() throws EmptyQueueException{
+		if(!empty()){
+			Data temp=((Node)heap[1]).data;
+			return temp;
+		}else{
+			throw new EmptyQueueException("There is no element in the heap!");
+		}
+	}
+	public void enqueue(P priority, Data data){
+		if(wurzel==null){
+			wurzel.priority=priority;
+			wurzel.data=data;
+			heap[1]=wurzel;
+			num++;
+			heap[0]=num;
+		}else{
+			Node temp=new Node(data,priority);
+			heap[(heapsize(heap))+1]=temp;
+			maxHeapify(heap,heapsize(heap)+1);
+			num++;
+			heap[0]=num;
+		}
+	}
+	
+	private class Node{
+		private Data data;
+		private P priority;
+		public Node(Data data,P priority){
+			this.data=data;
+			this.priority=priority;
+		}
+	}
+}
+class SimulateMessageTraffic{
+	public static void test() throws Exception{
+		PriorityQueue<Integer,String> queue=new PriorityQueue<Integer,String>();
+		queue.enqueue(1,"1");
+		System.out.println(queue.toString());
+	}
+}
 public class U9{
 	public static void main(String args[]) throws Exception{
-		TestArrayQueue.test();
+		//TestArrayQueue.test();
+		SimulateMessageTraffic.test();
 	}
 }
 
