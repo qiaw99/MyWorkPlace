@@ -258,8 +258,7 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 	}
 	
 	public void buildPriorityQueue(Object[]heap){
-		int temp=heap.length-1;
-		for(int i=temp/2;i>0;i--){
+		for(int i=heapsize(heap)/2;i>0;i--){
 			maxHeapify(heap,i);
 		}
 	}
@@ -271,8 +270,8 @@ class PriorityQueue <P extends Comparable<P>, Data>{
 	public Data dequeue() throws EmptyQueueException{
 		if(!empty()){
 			Data temp=((Node)heap[1]).data;
-			heap[1]=null;
-			maxHeapify(heap,1);
+			heap[1]=heap[heapsize(heap)];
+			buildPriorityQueue(heap);
 			num--;
 			heap[0]=num;
 			return temp;
@@ -328,19 +327,32 @@ class SimulateMessageTraffic{
 		PriorityQueue<Integer,String> queue=new PriorityQueue<Integer,String>();
 		System.out.println("Is the heap empty?");
 		System.out.println(queue.empty());
-		queue.enqueue(1,"1");
+		System.out.println("enqueue: priority: 5 , data: \"1\"");
+		queue.enqueue(5,"1");
+		System.out.println("enqueue: priority: 3 , data: \"2\"");
 		queue.enqueue(3,"2");
-		queue.enqueue(4,"6");
-		queue.enqueue(5,"4");
+		System.out.println("enqueue: priority: 6 , data: \"6\"");
+		queue.enqueue(6,"6");
+		System.out.println("enqueue: priority: 1 , data: \"4\"");
+		queue.enqueue(1,"4");
+		System.out.println();
+		System.out.println("The information of heap structure:");
+		queue.getInfo();
+		System.out.println();
+		System.out.println("Highest priority?");
 		System.out.println(queue.highest());
+		System.out.println("Dequeue?");
+		System.out.println(queue.dequeue());
 		queue.getInfo();
 	}
 }
 
 public class U9{
 	public static void main(String args[]) throws Exception{
-		//TestArrayQueue.test();
+		System.out.println("********************Aufgabe 1********************");
 		SimulateMessageTraffic.test();
+		System.out.println("********************Aufgabe 2********************");
+		TestArrayQueue.test();
 	}
 }
 
