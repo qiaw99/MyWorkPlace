@@ -20,6 +20,10 @@
 
 typedef int (*pfn_sent_response)(int , char *);
 
+struct sockaddr_in client_addr;
+socklen_t addrlen;
+
+
 static int send_dir_info (int fd, char *path);
 static int send_file_content(int fd, char *path);
 static int send_not_found (int fd, char *path);
@@ -75,8 +79,9 @@ static int init_inet_socket (int type) {
     }
 
     addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     addr.sin_port = htons(INET_PORT_DEFAULT);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
 
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         LOGE("bind error = %s", strerror(errno));
@@ -125,7 +130,7 @@ static int send_file_content(int fd, char *path) {
 
     fclose(hFile);
 
-    if (write(fd, file_content, file_size) != (ssize_t)file_size) {
+    if (sendto(fd, file_content, file_size, 0, (const struct sockaddr *) &client_addr, addrlen) != (ssize_t)file_size) {
         LOGE("Failed to send data\n");
         free(file_content);
         return -1;
@@ -144,7 +149,7 @@ static int send_dir_info (int fd, char *path) {
 
         while (dir!= NULL) {
             printf("%s \n", dir->d_name);
-            if (write(fd, dir->d_name, strlen(dir->d_name)) != (ssize_t)strlen(dir->d_name) || write(fd, backSpace, strlen(backSpace)) != (ssize_t)strlen(backSpace))
+            if (sendto(fd, dir->d_name, strlen(dir->d_name), 0, (const struct sockaddr *) &client_addr, addrlen) != (ssize_t)strlen(dir->d_name) || write(fd, backSpace, strlen(backSpace)) != (ssize_t)strlen(backSpace))
                 LOGE("Failed to write data to a socket\n");
 
             dir = readdir(d);
@@ -168,7 +173,7 @@ static int send_not_found (int fd, char *path) {
     }
 
     sprintf(data, "%s%s", NOT_FOUND_RESPONSE, path);
-    if (write(fd, data, data_len) != (ssize_t)data_len) {
+    if (sendto(fd, data, data_len , 0, (const struct sockaddr *) &client_addr, addrlen) != (ssize_t)data_len) {
         LOGE("Failed to send response\n");
         return -1;
     }
@@ -178,11 +183,12 @@ static int send_not_found (int fd, char *path) {
 
 static int handle_input_connection(int fd) {
     char path [PATH_MAX] = { 0, };
-    ssize_t len = read(fd, path, sizeof(path));
+    ssize_t len = recvfrom (fd, path, sizeof(path), 0, (struct sockaddr*)&client_addr, &addrlen);
     pfn_sent_response response_fn;
 
     if (len <= 0 || len == sizeof(path)) {
         LOGE("Something went wrong. Read returned %zu\n", len);
+        LOGE("read err = %s", strerror(errno));
         return -1;
     }
 
@@ -200,16 +206,18 @@ static int handle_input_connection(int fd) {
 
 int main(int argc, char *argv[]) {
     int fd = -1;
-
+    int ifAccept = 0;
     if (argc != 3 || argv[1][0] != '-') {
         print_usage();
         return -1;
     }
+    addrlen = sizeof(client_addr);
 
     switch (argv[1][1]) {
         case 'U':
             LOGI("Starting UNIX with %s adress...", argv[2]);
             fd = init_unix_socket(argv[2]);
+            ifAccept = 1;
             break;
         case 'u':
             LOGI("Starting UDP inet socket on local IP address. Any input address will be ignored...");
@@ -218,6 +226,7 @@ int main(int argc, char *argv[]) {
         case 't':
             LOGI("Starting TCP inet socket on local IP address. Any input address will be ignored...");
             fd = init_inet_socket(SOCK_STREAM);
+            ifAccept = 1;
             break;
         default:
             LOGE("Unknown argument");
@@ -241,39 +250,23 @@ int main(int argc, char *argv[]) {
     }
 
 
-    while (1) {
-        int session_fd = accept(fd, NULL, NULL);
-        if (session_fd <= 0) {
-            LOGE("Failed to accept. something went wrong...");
-            break;
+    for(int i = 0; i < 2; i++) {
+        if(ifAccept) {
+            int session_fd = accept(fd, NULL, NULL);
+            if (session_fd <= 0) {
+                LOGE("Failed to accept. something went wrong = %s", strerror(errno));
+                //break;
+            }
+            if (handle_input_connection(session_fd))
+                close(session_fd);
         }
-
-        if (handle_input_connection(session_fd))
-            close(session_fd);
+        else {
+            printf("file desc is %d\n", fd);
+            handle_input_connection(fd);
+        }
 
     }
 
     return 0;
 }
-
-
-/*struct dirent *ptr;
-    DIR *dir = opendir(path);
-    if(dir == NULL){
-        fprintf (stderr,"Error when opening the folder!\n");
-        return -1;
-    }
-    LOGI("The content is: \n");
-    while ((ptr = readdir(dir)) != NULL) {
-        if (strcmp(ptr->d_name,".") == 0 || strcmp(ptr->d_name,"..") == 0) {
-            continue;
-        }
-        else {
-            if (write(fd, ptr->d_name, strlen(ptr->d_name) != strlen(ptr->d_name)))
-                LOGE("Failed to write data to a socket");
-        }
-    }
-    closedir(dir);
-    return 0;*/
-
 
