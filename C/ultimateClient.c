@@ -18,6 +18,9 @@
 #define INET_PORT_DEFAULT 8080
 #define CLIENT_PATH "tpf_unix_sock.client"
 
+struct sockaddr_in connect_addr;
+socklen_t addrlen;
+
 static void print_usage () {
     printf("\nUsage:\n");
     printf("./client -U <server_path> <file/folder_request> startet den Client mit Unix-Sockets,\n"
@@ -69,19 +72,23 @@ static int init_inet_socket (int type) {
     if (connect(fd, (struct sockaddr*)&sockaddrin, sizeof(sockaddrin))) {
             printf("connection with the server failed...\n");
             return -1;
-        }
+    }
 
     return fd;
 }
 
 int main (int argc, char* argv []) {
-    char buff[2];
+    char buff[4048];
     ssize_t char_read = 0;
     int fd = -1;
     if (argc != 4 || argv[1][0] != '-') {
         print_usage();
         return -1;
     }
+    connect_addr.sin_family = AF_INET;
+    connect_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    connect_addr.sin_port = htons(INET_PORT_DEFAULT);
+    addrlen = sizeof(connect_addr);
 
     switch (argv[1][1]) {
         case 'U':
@@ -105,19 +112,18 @@ int main (int argc, char* argv []) {
         LOGE("Error happened. Leaving...");
         return -1;
     }
-
-    if (write (fd, argv[3], sizeof(argv[3])) != sizeof (argv[3])) {
+    if (sendto (fd, argv[3], strlen(argv[3]), 0, (struct sockaddr*)&connect_addr, addrlen) != strlen (argv[3])) {
         LOGE("Failed to send folder/file_path\n");
         return -1;
     }
 
-    char_read = read (fd, buff, sizeof(buff));
+    char_read = recvfrom (fd, buff, sizeof(buff), 0, (struct sockaddr*)&connect_addr, &addrlen);
     if(!char_read) {
         LOGE("I DON'T SEE ANYTHING OVER HERE!\n");
     }
     while (char_read > 0) {
-        fwrite (buff, (unsigned long)char_read, 1,stdout);
-        char_read = read (fd, buff, sizeof(buff));
+        fwrite (buff, (unsigned long)char_read, 1, stdout);
+        char_read = recvfrom (fd, buff, sizeof(buff), 0, (struct sockaddr*)&connect_addr, &addrlen);
     }
 
     return 0;
