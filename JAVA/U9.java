@@ -139,23 +139,23 @@ class simpleQueue<E> implements Queue<E>{
 		}	
 	}
 	private class QueueIterator<T> implements Iterator<E>{	/*Innere Klasse*/
-        int current;
-        public QueueIterator(){
-            current=head;
-        }
-        public boolean hasNext(){
-            return queue[current]!=null;
-        }
-        public E next(){
-        	E temp = queue[current+1];
-        	if(current<queue.length-1)
-        		current++;
-        	else{
-        		current=0;
-        	}
-        	return temp;
-        	
-        }
+		int current;
+		public QueueIterator(){
+		    current=head;
+		}
+		public boolean hasNext(){
+		    return queue[current]!=null;
+		}
+		public E next(){
+			E temp = queue[current+1];
+			if(current<queue.length-1)
+				current++;
+			else{
+				current=0;
+			}
+			return temp;
+
+		}
 	}
     public Iterator<E> iterator(){		/*Iterator-Schnittstelle implementieren*/
         return new QueueIterator<E>();
