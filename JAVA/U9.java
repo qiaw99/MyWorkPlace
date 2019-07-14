@@ -109,7 +109,7 @@ class simpleQueue<E> implements Queue<E>{
 		}
 	}
 	public E first() throws EmptyQueueException{
-		if(full()){
+		if(empty()){
 			throw new EmptyQueueException("There is no element in the queue!");
 		}else{
 			E elem = queue[head];
